@@ -41,28 +41,24 @@ app.get('/fixAnnotated', function( req, res ) {
   query( myQuery )
     .then( async function(response) {
       const data = parseBindings(response.results.bindings);
-      console.log(data[0].mappings)
       const annotatedArray = generateAnnotatedArray(data);
       const slicedArray = sliceArray(annotatedArray, 10);
       for(let array of slicedArray) {
-        console.log(array)
-        const updateQuery = generateUpdateQuery(array)
-        console.log(updateQuery)
-        await update(updateQuery)
+        const updateQuery = generateUpdateQuery(array);
+        await update(updateQuery);
       }
-      res.end('Done')
+      res.end('Done');
     })
     .catch( function(err) {
-      console.log(err)
       res.send( "Oops something went wrong: " + JSON.stringify( err ) );
     });
 } );
 
 function sliceArray(array, chunkSize) {
-  const result = []
+  const result = [];
   for (let i = 0; i < array.length; i += chunkSize) {
     let chunk = array.slice(i, i + chunkSize);
-    result.push(chunk)
+    result.push(chunk);
   }
   return result;
 }
@@ -72,8 +68,8 @@ function generateAnnotatedArray(data) {
     return {
       uri: template.uri,
       annotated: includeMappings(template.templateValue, template.mappings)
-    }
-  })
+    };
+  });
 }
 
 function generateTextTemplate(uri, name) {
@@ -146,7 +142,7 @@ function parseBindings(bindings) {
         uri: binding.mapping.value,
         type: binding.type.value,
         variable: binding.variable.value,
-      }
+      };
       if(binding.codelist) {
         mapping.codelist = binding.codelist.value;
       }
