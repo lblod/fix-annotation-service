@@ -18,7 +18,8 @@ app.get('/fixAnnotated', function( req, res ) {
     PREFIX mobiliteit: <https://data.vlaanderen.be/ns/mobiliteit#>
 
   SELECT ?uri ?templateValue ?mapping ?type ?variable ?codelist WHERE {
-      
+    ?a <http://mu.semte.ch/vocabularies/core/uuid> "619794E534D7B6000900001C".
+    ?a ext:template ?uri.
     ?uri a ext:Template;
     ext:value ?templateValue.
 
@@ -33,16 +34,18 @@ app.get('/fixAnnotated', function( req, res ) {
         
   }
 
-  FILTER NOT EXISTS { ?uri ext:annotated ?annotated }
+  
 
   }`;
 
   query( myQuery )
     .then( async function(response) {
       const data = parseBindings(response.results.bindings);
+      console.log(data[0].mappings)
       const annotatedArray = generateAnnotatedArray(data);
       const slicedArray = sliceArray(annotatedArray, 10);
       for(let array of slicedArray) {
+        console.log(array)
         const updateQuery = generateUpdateQuery(array)
         console.log(updateQuery)
         await update(updateQuery)
@@ -130,7 +133,6 @@ function includeMappings(html, mappings) {
 function parseBindings(bindings) {
   const data = {};
   for(let binding of bindings) {
-    console.log(binding)
     const uri = binding.uri.value;
     if (!data[uri]) {
       data[uri] = {
