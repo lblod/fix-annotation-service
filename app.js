@@ -164,7 +164,7 @@ function generateUpdateQuery(annotatedArray) {
         ${annotatedArray.map((template) => `<${template.uri}> ext:annotated ${sparqlEscapeString(template.annotated)}.`).join(' ')}
       }
     }
-  `
+  `;
 }
 
 app.use(errorHandler);
