@@ -1,0 +1,69 @@
+---
+kind: pipeline
+type: docker
+name: verify
+steps:
+- name: install
+  image: node:14
+  commands:
+    - npm install
+- name: lint
+  image: node:14
+  commands:
+    - npm run lint
+- name: build-dry-run
+  image: plugins/docker
+  settings:
+    repo: lblod/fix-annotation-service
+    dry_run: true
+    purge: true
+trigger:
+  event:
+    - push
+---
+kind: pipeline
+type: docker
+name: push-latest-build
+steps:
+- name: push-latest-build
+  image: plugins/docker
+  settings:
+    repo: lblod/fix-annotation-service
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+trigger:
+  branch:
+    - master
+  event:
+    exclude:
+    - pull_request
+---
+kind: pipeline
+type: docker
+name: release
+steps:
+- name: build-dry-run
+  image: plugins/docker
+  settings:
+    repo: lblod/fix-annotation-service
+    dry_run: true
+- name: push-tagged-build
+  image: plugins/docker
+  settings:
+    repo: lblod/fix-annotation-service
+    tags: ${DRONE_TAG##v}
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+    purge: true
+trigger:
+  event:
+    - tag
+---
+kind: signature
+hmac: 76ffa5ccfc65eb9c769af3a4f50acf93100c2a07137575cb3941c2bf4b81a1a9
+
+...
