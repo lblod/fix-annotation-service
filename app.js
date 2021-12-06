@@ -34,7 +34,7 @@ app.post('/fixAnnotated', function( req, res ) {
 
   FILTER NOT EXISTS { ?uri ext:annotated ?annotated }
 
-  }`;
+  }LIMIT 10`;
 
   query( myQuery )
     .then( async function(response) {
@@ -63,6 +63,7 @@ function sliceArray(array, chunkSize) {
 }
 
 function generateAnnotatedArray(data) {
+  console.log(data);
   return data.map((template) => {
     return {
       uri: template.uri,
