@@ -110,17 +110,17 @@ function includeMappings(html, mappings) {
     } else if (mapping.type === 'codelist') {
       const codeList = mapping.codelist;
       finalHtml = finalHtml.replace(
-        `/\${${mapping.variable}}/g`,
+        /\${${mapping.variable}}/g,
         generateCodelistTemplate(mapping.uri, mapping.variable, codeList)
       );
     } else if (mapping.type === 'location') {
       finalHtml = finalHtml.replace(
-        `/\${${mapping.variable}}/g`,
+        /\${${mapping.variable}}/g,
         generateLocationTemplate(mapping.uri, mapping.variable)
       );
     } else {
       finalHtml = finalHtml.replace(
-        `/\${${mapping.variable}}/g`,
+        /\${${mapping.variable}}/g,
         generateTextTemplate(mapping.uri, mapping.variable)
       );
     }
