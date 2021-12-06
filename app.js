@@ -62,10 +62,6 @@ function sliceArray(array, chunkSize) {
 function generateAnnotatedArray(data) {
   
   return data.map((template) => {
-    console.log('=====================');
-    console.log(template.templateValue);
-    console.log(template.mappings);
-    console.log('=====================');
     return {
       uri: template.uri,
       annotated: includeMappings(template.templateValue, template.mappings)
