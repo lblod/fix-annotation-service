@@ -37,7 +37,6 @@ app.post('/fixAnnotated', function( req, res ) {
 
   query( myQuery )
     .then( async function(response) {
-      console.log(response);
       const data = parseBindings(response.results.bindings);
       const annotatedArray = generateAnnotatedArray(data);
       const slicedArray = sliceArray(annotatedArray, 10);
@@ -63,8 +62,12 @@ function sliceArray(array, chunkSize) {
 }
 
 function generateAnnotatedArray(data) {
-  console.log(data);
+  
   return data.map((template) => {
+    console.log('=====================');
+    console.log(template.templateValue);
+    console.log(template.mappings);
+    console.log('=====================');
     return {
       uri: template.uri,
       annotated: includeMappings(template.templateValue, template.mappings)
@@ -127,7 +130,6 @@ function includeMappings(html, mappings) {
 
 
 function parseBindings(bindings) {
-  console.log(bindings);
   const data = {};
   for(let binding of bindings) {
     const uri = binding.uri.value;
