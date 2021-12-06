@@ -18,7 +18,6 @@ app.post('/fixAnnotated', function( req, res ) {
     PREFIX mobiliteit: <https://data.vlaanderen.be/ns/mobiliteit#>
 
   SELECT ?uri ?templateValue ?mapping ?type ?variable ?codelist WHERE {
-    ?a <http://mu.semte.ch/vocabularies/core/uuid> "619794E534D7B6000900001C".
     ?a ext:template ?uri.
     ?uri a ext:Template;
     ext:value ?templateValue.
