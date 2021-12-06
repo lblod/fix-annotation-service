@@ -127,6 +127,7 @@ function includeMappings(html, mappings) {
 
 
 function parseBindings(bindings) {
+  console.log(bindings);
   const data = {};
   for(let binding of bindings) {
     const uri = binding.uri.value;
