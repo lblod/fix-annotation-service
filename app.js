@@ -32,7 +32,6 @@ app.post('/fixAnnotated', function( req, res ) {
     }
   }
 
-  FILTER NOT EXISTS { ?uri ext:annotated ?annotated }
 
   }LIMIT 10`;
 
@@ -162,7 +161,7 @@ function generateUpdateQuery(annotatedArray) {
   return `
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
     INSERT DATA {
-      GRAPH <http://mu.semte.ch/graphs/application> {
+      GRAPH <http://mu.semte.ch/graphs/mow/registry> {
         ${annotatedArray.map((template) => `<${template.uri}> ext:annotated ${sparqlEscapeString(template.annotated)}.`).join(' ')}
       }
     }
