@@ -18,7 +18,6 @@ app.post('/fixAnnotated', function( req, res ) {
     PREFIX mobiliteit: <https://data.vlaanderen.be/ns/mobiliteit#>
 
   SELECT ?uri ?templateValue ?mapping ?type ?variable ?codelist WHERE {
-    ?a ext:template ?uri.
     ?uri a ext:Template;
     ext:value ?templateValue.
 
@@ -31,8 +30,6 @@ app.post('/fixAnnotated', function( req, res ) {
       ?mapping ext:codeList ?codelist.
     }
   }
-
-  FILTER NOT EXISTS { ?uri ext:annotated ?annotated }
 
   }`;
 
@@ -63,6 +60,7 @@ function sliceArray(array, chunkSize) {
 }
 
 function generateAnnotatedArray(data) {
+  
   return data.map((template) => {
     return {
       uri: template.uri,
@@ -101,22 +99,23 @@ function generateLocationTemplate(uri, name) {
 function includeMappings(html, mappings) {
   let finalHtml = html;
   for (let mapping of mappings) {
+    const regex = new RegExp(`\\\${${mapping.variable}}`, 'g');
     if (mapping.type === 'instruction') {
       continue;
     } else if (mapping.type === 'codelist') {
       const codeList = mapping.codelist;
       finalHtml = finalHtml.replace(
-        `/\${${mapping.variable}}/g`,
+        regex,
         generateCodelistTemplate(mapping.uri, mapping.variable, codeList)
       );
     } else if (mapping.type === 'location') {
       finalHtml = finalHtml.replace(
-        `/\${${mapping.variable}}/g`,
+        regex,
         generateLocationTemplate(mapping.uri, mapping.variable)
       );
     } else {
       finalHtml = finalHtml.replace(
-        `/\${${mapping.variable}}/g`,
+        regex,
         generateTextTemplate(mapping.uri, mapping.variable)
       );
     }
@@ -159,7 +158,7 @@ function generateUpdateQuery(annotatedArray) {
   return `
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
     INSERT DATA {
-      GRAPH <http://mu.semte.ch/graphs/application> {
+      GRAPH <http://mu.semte.ch/graphs/mow/registry> {
         ${annotatedArray.map((template) => `<${template.uri}> ext:annotated ${sparqlEscapeString(template.annotated)}.`).join(' ')}
       }
     }
