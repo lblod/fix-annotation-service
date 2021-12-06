@@ -48,7 +48,8 @@ app.post('/fixAnnotated', function( req, res ) {
       res.end('Done');
     })
     .catch( function(err) {
-      res.send( "Oops something went wrong: " + JSON.stringify( err ) );
+      res.send( "Oops something went wrong: " + err);
+      console.log(err);
     });
 } );
 
