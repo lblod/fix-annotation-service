@@ -38,6 +38,7 @@ app.post('/fixAnnotated', function( req, res ) {
 
   query( myQuery )
     .then( async function(response) {
+      console.log(response);
       const data = parseBindings(response.results.bindings);
       const annotatedArray = generateAnnotatedArray(data);
       const slicedArray = sliceArray(annotatedArray, 10);
