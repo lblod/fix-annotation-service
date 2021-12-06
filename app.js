@@ -105,18 +105,18 @@ function includeMappings(html, mappings) {
       continue;
     } else if (mapping.type === 'codelist') {
       const codeList = mapping.codelist;
-      finalHtml = finalHtml.replaceAll(
-        `\${${mapping.variable}}`,
+      finalHtml = finalHtml.replace(
+        `/\${${mapping.variable}}/g`,
         generateCodelistTemplate(mapping.uri, mapping.variable, codeList)
       );
     } else if (mapping.type === 'location') {
-      finalHtml = finalHtml.replaceAll(
-        `\${${mapping.variable}}`,
+      finalHtml = finalHtml.replace(
+        `/\${${mapping.variable}}/g`,
         generateLocationTemplate(mapping.uri, mapping.variable)
       );
     } else {
-      finalHtml = finalHtml.replaceAll(
-        `\${${mapping.variable}}`,
+      finalHtml = finalHtml.replace(
+        `/\${${mapping.variable}}/g`,
         generateTextTemplate(mapping.uri, mapping.variable)
       );
     }
@@ -132,7 +132,7 @@ function parseBindings(bindings) {
     if (!data[uri]) {
       data[uri] = {
         uri: uri,
-        templateValue: binding.templateValue.value,
+        templateValue: binding.templateValue.value || '',
         mappings: [],
       };
     }
