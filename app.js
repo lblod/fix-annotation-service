@@ -30,10 +30,9 @@ app.post('/fixAnnotated', function( req, res ) {
     OPTIONAL {
       ?mapping ext:codeList ?codelist.
     }
-        
   }
 
-  
+  FILTER NOT EXISTS { ?uri ext:annotated ?annotated }
 
   }`;
 
