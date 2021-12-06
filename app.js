@@ -105,22 +105,23 @@ function generateLocationTemplate(uri, name) {
 function includeMappings(html, mappings) {
   let finalHtml = html;
   for (let mapping of mappings) {
+    const regex = new RegExp(`\\\${${mapping.variable}}`, 'g');
     if (mapping.type === 'instruction') {
       continue;
     } else if (mapping.type === 'codelist') {
       const codeList = mapping.codelist;
       finalHtml = finalHtml.replace(
-        /\${${mapping.variable}}/g,
+        regex,
         generateCodelistTemplate(mapping.uri, mapping.variable, codeList)
       );
     } else if (mapping.type === 'location') {
       finalHtml = finalHtml.replace(
-        /\${${mapping.variable}}/g,
+        regex,
         generateLocationTemplate(mapping.uri, mapping.variable)
       );
     } else {
       finalHtml = finalHtml.replace(
-        /\${${mapping.variable}}/g,
+        regex,
         generateTextTemplate(mapping.uri, mapping.variable)
       );
     }
