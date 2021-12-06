@@ -6,7 +6,7 @@ app.get('/', function( req, res ) {
 } );
 
 
-app.get('/fixAnnotated', function( req, res ) {
+app.post('/fixAnnotated', function( req, res ) {
   var myQuery = `
     PREFIX ex: <http://example.org#>
     PREFIX lblodMobilitiet: <http://data.lblod.info/vocabularies/mobiliteit/>
