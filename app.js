@@ -31,6 +31,8 @@ app.post('/fixAnnotated', function( req, res ) {
     }
   }
 
+  FILTER NOT EXISTS { ?uri ext:annotated ?annotated }
+
   }`;
 
   query( myQuery )
