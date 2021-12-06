@@ -18,7 +18,6 @@ app.post('/fixAnnotated', function( req, res ) {
     PREFIX mobiliteit: <https://data.vlaanderen.be/ns/mobiliteit#>
 
   SELECT ?uri ?templateValue ?mapping ?type ?variable ?codelist WHERE {
-    ?a ext:template ?uri.
     ?uri a ext:Template;
     ext:value ?templateValue.
 
@@ -32,8 +31,7 @@ app.post('/fixAnnotated', function( req, res ) {
     }
   }
 
-
-  }LIMIT 10`;
+  }`;
 
   query( myQuery )
     .then( async function(response) {
