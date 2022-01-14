@@ -31,8 +31,6 @@ app.post('/fixAnnotated', function( req, res ) {
     }
   }
 
-  FILTER NOT EXISTS { ?uri ext:annotated ?annotated }
-
   }`;
 
   query( myQuery )
@@ -98,6 +96,15 @@ function generateLocationTemplate(uri, name) {
   `;
 }
 
+function generateDateTemplate(uri, name) {
+  return `
+    <span resource="${uri}" typeof="ext:Mapping">
+      <span property="dct:type" content="date"></span>
+      <span property="ext:content" datatype="xsd:date">\${${name}}</span>
+    </span>
+  `;
+}
+
 function includeMappings(html, mappings) {
   let finalHtml = html;
   for (let mapping of mappings) {
@@ -115,9 +122,14 @@ function includeMappings(html, mappings) {
         regex,
         generateLocationTemplate(mapping.uri, mapping.variable)
       );
+    } else if (mapping.type === 'date') {
+      finalHtml = finalHtml.replaceAll(
+        `\${${mapping.variable}}`,
+        generateDateTemplate(mapping.uri, mapping.variable)
+      );
     } else {
-      finalHtml = finalHtml.replace(
-        regex,
+      finalHtml = finalHtml.replaceAll(
+        `\${${mapping.variable}}`,
         generateTextTemplate(mapping.uri, mapping.variable)
       );
     }
