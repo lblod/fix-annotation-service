@@ -123,13 +123,13 @@ function includeMappings(html, mappings) {
         generateLocationTemplate(mapping.uri, mapping.variable)
       );
     } else if (mapping.type === 'date') {
-      finalHtml = finalHtml.replaceAll(
-        `\${${mapping.variable}}`,
+      finalHtml = finalHtml.replace(
+        regex,
         generateDateTemplate(mapping.uri, mapping.variable)
       );
     } else {
-      finalHtml = finalHtml.replaceAll(
-        `\${${mapping.variable}}`,
+      finalHtml = finalHtml.replace(
+        regex,
         generateTextTemplate(mapping.uri, mapping.variable)
       );
     }
