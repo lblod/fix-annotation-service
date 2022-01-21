@@ -173,9 +173,9 @@ function generateUpdateQuery(annotatedArray) {
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
     DELETE WHERE {
       GRAPH <http://mu.semte.ch/graphs/public> { 
-        ${annotatedArray.map((template) => `<${template.uri}> ext:annotated ?annotated.`).join(' ')}
+        ${annotatedArray.map((template, index) => `<${template.uri}> ext:annotated ?${index}.`).join(' ')}
       }
-    }
+    };
     INSERT DATA {
       GRAPH <http://mu.semte.ch/graphs/mow/registry> {
         ${annotatedArray.map((template) => `<${template.uri}> ext:annotated ${sparqlEscapeString(template.annotated)}.`).join(' ')}
