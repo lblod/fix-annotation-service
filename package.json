@@ -1,6 +1,6 @@
 {
   "name": "fix-annotation-service",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "This plugin generates annotated versions of all the templates that don't have it. In order to do that you just have to send a  POST request to `/fixAnnotated` and the server will answer with `Done` once it has finished.",
   "main": "app.js",
   "scripts": {
