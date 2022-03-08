@@ -5,6 +5,15 @@ app.get('/', function( req, res ) {
   res.send('Hello mu-javascript-template');
 } );
 
+async function deleteAnotated(){
+  const query=`
+  DELETE WHERE{
+    GRAPH ?g{
+     ?a <http://mu.semte.ch/vocabularies/ext/annotated> ?b
+  }}`
+
+  await updateSudo(query);
+}
 
 app.post('/fixAnnotated', function( req, res ) {
   var myQuery = `
@@ -38,6 +47,7 @@ app.post('/fixAnnotated', function( req, res ) {
       const data = parseBindings(response.results.bindings);
       const annotatedArray = generateAnnotatedArray(data);
       const slicedArray = sliceArray(annotatedArray, 10);
+      await deleteAnotated();
       for(let array of slicedArray) {
         const updateQuery = generateUpdateQuery(array);
         await update(updateQuery);
