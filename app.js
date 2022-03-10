@@ -17,7 +17,7 @@ app.post('/fixAnnotated', function( req, res ) {
     PREFIX org: <http://www.w3.org/ns/org#>
     PREFIX mobiliteit: <https://data.vlaanderen.be/ns/mobiliteit#>
 
-  SELECT ?uri ?templateValue ?mapping ?type ?variable ?codelist WHERE {
+  SELECT DISTINCT ?uri ?templateValue ?mapping ?type ?variable ?codelist WHERE {
     ?uri a ext:Template;
     ext:value ?templateValue.
 
@@ -171,11 +171,14 @@ function parseBindings(bindings) {
 function generateUpdateQuery(annotatedArray) {
   return `
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
-    DELETE WHERE {
-      GRAPH <http://mu.semte.ch/graphs/public> { 
-        ${annotatedArray.map((template, index) => `<${template.uri}> ext:annotated ?${index}.`).join(' ')}
-      }
-    };
+    ${annotatedArray.map((template) => `
+      DELETE WHERE {
+        GRAPH <http://mu.semte.ch/graphs/mow/registry> { 
+          <${template.uri}> ext:annotated ?template.
+        }
+      };
+    `).join(' ')}
+
     INSERT DATA {
       GRAPH <http://mu.semte.ch/graphs/mow/registry> {
         ${annotatedArray.map((template) => `<${template.uri}> ext:annotated ${sparqlEscapeString(template.annotated)}.`).join(' ')}
