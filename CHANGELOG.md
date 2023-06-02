@@ -1,4 +1,13 @@
 
+
+## 1.0.0 (2023-06-02)
+
+#### :boom: Breaking Change
+* [#6](https://github.com/lblod/fix-annotation-service/pull/6) update templates to be include the source ([@lagartoverde](https://github.com/lagartoverde))
+
+#### Committers: 1
+- Oscar Rodriguez Villalobos ([@lagartoverde](https://github.com/lagartoverde))
+
 ## 0.0.13 (2022-03-10)
 
 #### :bug: Bug Fix
