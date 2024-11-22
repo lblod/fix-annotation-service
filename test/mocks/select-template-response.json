@@ -1,0 +1,165 @@
+{
+  "results": {
+    "ordered": true,
+    "distinct": false,
+    "bindings": [
+      {
+        "variable": {
+          "value": "codelijst",
+          "type": "literal"
+        },
+        "uri": {
+          "value": "http://data.lblod.info/templates/6486F5D34E5B47D5A3A1EDDF",
+          "type": "uri"
+        },
+        "type": {
+          "value": "codelist",
+          "type": "literal"
+        },
+        "templateValue": {
+          "value": "${locatie} abc, ${autonummer} dan ${tekst} codelijst van ${codelijst} en ook nog is een datum eh ${datum} ${cijferstesten}",
+          "type": "literal"
+        },
+        "mapping": {
+          "value": "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE6",
+          "type": "uri"
+        },
+        "codelist": {
+          "value": "http://lblod.data.gift/concept-schemes/61C054CEE3249100080000B9",
+          "type": "uri"
+        }
+      },
+      {
+        "variable": {
+          "value": "cijferstesten",
+          "type": "literal"
+        },
+        "uri": {
+          "value": "http://data.lblod.info/templates/6486F5D34E5B47D5A3A1EDDF",
+          "type": "uri"
+        },
+        "type": {
+          "value": "number",
+          "type": "literal"
+        },
+        "templateValue": {
+          "value": "${locatie} abc, ${autonummer} dan ${tekst} codelijst van ${codelijst} en ook nog is een datum eh ${datum} ${cijferstesten}",
+          "type": "literal"
+        },
+        "mapping": {
+          "value": "http://data.lblod.info/mappings/649D79A34E5B47D5A3A1EE0F",
+          "type": "uri"
+        }
+      },
+      {
+        "variable": {
+          "value": "locatie",
+          "type": "literal"
+        },
+        "uri": {
+          "value": "http://data.lblod.info/templates/6486F5D34E5B47D5A3A1EDDF",
+          "type": "uri"
+        },
+        "type": {
+          "value": "location",
+          "type": "literal"
+        },
+        "templateValue": {
+          "value": "${locatie} abc, ${autonummer} dan ${tekst} codelijst van ${codelijst} en ook nog is een datum eh ${datum} ${cijferstesten}",
+          "type": "literal"
+        },
+        "mapping": {
+          "value": "http://data.lblod.info/mappings/6486F5D44E5B47D5A3A1EDE3",
+          "type": "uri"
+        }
+      },
+      {
+        "variable": {
+          "value": "autonummer",
+          "type": "literal"
+        },
+        "uri": {
+          "value": "http://data.lblod.info/templates/6486F5D34E5B47D5A3A1EDDF",
+          "type": "uri"
+        },
+        "type": {
+          "value": "number",
+          "type": "literal"
+        },
+        "templateValue": {
+          "value": "${locatie} abc, ${autonummer} dan ${tekst} codelijst van ${codelijst} en ook nog is een datum eh ${datum} ${cijferstesten}",
+          "type": "literal"
+        },
+        "mapping": {
+          "value": "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE4",
+          "type": "uri"
+        }
+      },
+      {
+        "uri": {
+          "value": "http://data.lblod.info/templates/1907fb2e-b36c-45b1-9a69-e2c367f4fb28",
+          "type": "uri"
+        },
+        "templateValue": {
+          "value": "de bestuurders hebben voorrang",
+          "type": "literal"
+        }
+      },
+      {
+        "variable": {
+          "value": "tekst",
+          "type": "literal"
+        },
+        "uri": {
+          "value": "http://data.lblod.info/templates/6486F5D34E5B47D5A3A1EDDF",
+          "type": "uri"
+        },
+        "type": {
+          "value": "text",
+          "type": "literal"
+        },
+        "templateValue": {
+          "value": "${locatie} abc, ${autonummer} dan ${tekst} codelijst van ${codelijst} en ook nog is een datum eh ${datum} ${cijferstesten}",
+          "type": "literal"
+        },
+        "mapping": {
+          "value": "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE5",
+          "type": "uri"
+        }
+      },
+      {
+        "variable": {
+          "value": "datum",
+          "type": "literal"
+        },
+        "uri": {
+          "value": "http://data.lblod.info/templates/6486F5D34E5B47D5A3A1EDDF",
+          "type": "uri"
+        },
+        "type": {
+          "value": "date",
+          "type": "literal"
+        },
+        "templateValue": {
+          "value": "${locatie} abc, ${autonummer} dan ${tekst} codelijst van ${codelijst} en ook nog is een datum eh ${datum} ${cijferstesten}",
+          "type": "literal"
+        },
+        "mapping": {
+          "value": "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE7",
+          "type": "uri"
+        }
+      }
+    ]
+  },
+  "head": {
+    "vars": [
+      "uri",
+      "templateValue",
+      "mapping",
+      "type",
+      "variable",
+      "codelist"
+    ],
+    "link": []
+  }
+}

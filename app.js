@@ -17,6 +17,44 @@ app.get("/", function (_req, res) {
  * @returns {Promise<void>} - A promise that resolves when the operation is complete.
  */
 const fetchAndUpdateAnnotations = async (_req, res) => {
+  try {
+    const response = await fetchTemplateData();
+    const data = parseBindings(response.results.bindings);
+    const annotatedArray = generateAnnotatedArray(data);
+    const chunkedAnnotatedArray = splitIntoChunks(annotatedArray, 10);
+    for (let chunkedTemplates of chunkedAnnotatedArray) {
+      const updateQuery = generateUpdateQuery(chunkedTemplates);
+      await update(updateQuery);
+    }
+    res.end("Done");
+  } catch (err) {
+    res.send("Oops something went wrong: " + err);
+    console.log(err);
+  }
+};
+
+/**
+ * @typedef {Object} SparqlSelectTemplatesBinding
+ * @property {SparqlValue} variable - The variable object
+ * @property {SparqlValue} uri - The URI object
+ * @property {SparqlValue} type - The type object
+ * @property {SparqlValue} templateValue - The template value object
+ * @property {SparqlValue} mapping - The mapping object
+ * @property {SparqlValue} [codelist] - The codelist object (optional)
+ */
+
+/**
+ * @typedef {Object} SparqlSelectTemplatesResponse
+ * @property {Object} results - The results object
+ * @property {SparqlSelectTemplatesBinding[]} results.bindings - The list of bindings
+ * @property {SparqlHead} head - The head object
+ */
+
+/**
+ * Fetches template data from the SPARQL endpoint.
+ * @returns {Promise<SparqlSelectTemplatesResponse>} The response object containing the bindings.
+ */
+const fetchTemplateData = async () => {
   var myQuery = `
     PREFIX ex: <http://example.org#>
     PREFIX lblodMobilitiet: <http://data.lblod.info/vocabularies/mobiliteit/>
@@ -40,23 +78,9 @@ const fetchAndUpdateAnnotations = async (_req, res) => {
       ?mapping ext:codeList ?codelist.
     }
   }
+  `;
 
-  }`;
-
-  try {
-    const response = await query(myQuery);
-    const data = parseBindings(response.results.bindings);
-    const annotatedArray = generateAnnotatedArray(data);
-    const chunkedAnnotatedArray = splitIntoChunks(annotatedArray, 10);
-    for (let chunkedTemplates of chunkedAnnotatedArray) {
-      const updateQuery = generateUpdateQuery(chunkedTemplates);
-      await update(updateQuery);
-    }
-    res.end("Done");
-  } catch (err) {
-    res.send("Oops something went wrong: " + err);
-    console.log(err);
-  }
+  return query(myQuery);
 };
 
 /**
@@ -75,11 +99,33 @@ export const splitIntoChunks = (dataArray, chunkSize) => {
   return result;
 };
 
+export const applyTemplateMappings = (basicTemplate, mappings) => {
+  let annotatedTemplate = basicTemplate;
+
+  const templateGenerators = {
+    codelist: (mapping) => generateCodelistTemplate(mapping.uri, mapping.variable, mapping.codelist),
+    location: (mapping) => generateLocationTemplate(mapping.uri, mapping.variable),
+    date: (mapping) => generateDateTemplate(mapping.uri, mapping.variable),
+    default: (mapping) => generateTextTemplate(mapping.uri, mapping.variable),
+  };
+
+  for (let mapping of mappings) {
+    if (mapping.type === "instruction") continue;
+
+    const regex = new RegExp(`\\\${${mapping.variable}}`, "g");
+    const generator = templateGenerators[mapping.type] || templateGenerators.default;
+
+    annotatedTemplate = annotatedTemplate.replace(regex, generator(mapping));
+  }
+
+  return annotatedTemplate;
+};
+
 function generateAnnotatedArray(data) {
   return data.map((template) => {
     return {
       uri: template.uri,
-      annotated: includeMappings(template.templateValue, template.mappings),
+      annotated: applyTemplateMappings(template.templateValue, template.mappings),
     };
   });
 }
@@ -122,42 +168,18 @@ function generateDateTemplate(uri, name) {
   `;
 }
 
-function includeMappings(html, mappings) {
-  let finalHtml = html;
-  for (let mapping of mappings) {
-    const regex = new RegExp(`\\\${${mapping.variable}}`, "g");
-    if (mapping.type === "instruction") {
-      continue;
-    } else if (mapping.type === "codelist") {
-      const codeList = mapping.codelist;
-      finalHtml = finalHtml.replace(
-        regex,
-        generateCodelistTemplate(mapping.uri, mapping.variable, codeList)
-      );
-    } else if (mapping.type === "location") {
-      finalHtml = finalHtml.replace(
-        regex,
-        generateLocationTemplate(mapping.uri, mapping.variable)
-      );
-    } else if (mapping.type === "date") {
-      finalHtml = finalHtml.replace(
-        regex,
-        generateDateTemplate(mapping.uri, mapping.variable)
-      );
-    } else {
-      finalHtml = finalHtml.replace(
-        regex,
-        generateTextTemplate(mapping.uri, mapping.variable)
-      );
-    }
-  }
-  return finalHtml;
-}
-
-function parseBindings(bindings) {
+/**
+ * Parses the bindings from the SPARQL response and organizes them into a more
+ * structured format.
+ * @param {SparqlSelectTemplatesBinding[]} bindings - The bindings to be parsed.
+ * @returns {Object[]} An array containing the parsed bindings.
+ */
+export const parseBindings = (bindings) => {
   const data = {};
   for (let binding of bindings) {
     const uri = binding.uri.value;
+
+    // Add default values if the uri is not in the data object
     if (!data[uri]) {
       data[uri] = {
         uri: uri,
@@ -165,24 +187,22 @@ function parseBindings(bindings) {
         mappings: [],
       };
     }
+
+    // Add the mapping to the data object
     if (binding.mapping) {
       const mapping = {
         uri: binding.mapping.value,
         type: binding.type.value,
         variable: binding.variable.value,
+        ...(binding.codelist && { codelist: binding.codelist.value }),
       };
-      if (binding.codelist) {
-        mapping.codelist = binding.codelist.value;
-      }
+
       data[uri].mappings.push(mapping);
     }
   }
-  const dataArray = [];
-  for (let key in data) {
-    dataArray.push(data[key]);
-  }
-  return dataArray;
-}
+  
+  return Object.values(data);
+};
 
 function generateUpdateQuery(annotatedArray) {
   return `
