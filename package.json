@@ -5,7 +5,8 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "mocha --exit"
   },
   "author": "redpencil.io",
   "license": "MIT",
@@ -14,7 +15,10 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
-    "eslint": "^9.15.0"
+    "eslint": "^9.15.0",
+    "esmock": "^2.6.9",
+    "mocha": "^10.8.2",
+    "sinon": "^19.0.2"
   },
   "repository": {
     "type": "git",

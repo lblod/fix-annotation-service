@@ -50,7 +50,7 @@ app.post('/fixAnnotated', function( req, res ) {
     });
 } );
 
-function sliceArray(array, chunkSize) {
+export const sliceArray = (array, chunkSize) => {
   const result = [];
   for (let i = 0; i < array.length; i += chunkSize) {
     let chunk = array.slice(i, i + chunkSize);
