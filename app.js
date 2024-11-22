@@ -1,12 +1,22 @@
-import { app, errorHandler, sparqlEscapeString } from 'mu';
-import { querySudo as query, updateSudo as update } from '@lblod/mu-auth-sudo';
+import { app, errorHandler, sparqlEscapeString } from "mu";
+import { querySudo as query, updateSudo as update } from "@lblod/mu-auth-sudo";
 
-app.get('/', function( req, res ) {
-  res.send('Hello mu-javascript-template');
-} );
+app.get("/", function (req, res) {
+  res.send("Hello mu-javascript-template");
+});
 
-
-app.post('/fixAnnotated', function( req, res ) {
+/**
+ * Fetches and updates annotations based on a predefined SPARQL query.
+ *
+ * This function executes a SPARQL query to fetch template data, processes the data,
+ * and updates the annotations in batches. It sends a response indicating the completion
+ * or an error message if something goes wrong.
+ *
+ * @param {import('express').Request} _req - The Express request object (not used in this function).
+ * @param {import('express').Response} res - The Express response object used to send the response.
+ * @returns {Promise<void>} - A promise that resolves when the operation is complete.
+ */
+const fetchAndUpdateAnnotations = async (_req, res) => {
   var myQuery = `
     PREFIX ex: <http://example.org#>
     PREFIX lblodMobilitiet: <http://data.lblod.info/vocabularies/mobiliteit/>
@@ -33,22 +43,21 @@ app.post('/fixAnnotated', function( req, res ) {
 
   }`;
 
-  query( myQuery )
-    .then( async function(response) {
-      const data = parseBindings(response.results.bindings);
-      const annotatedArray = generateAnnotatedArray(data);
-      const slicedArray = sliceArray(annotatedArray, 10);
-      for(let array of slicedArray) {
-        const updateQuery = generateUpdateQuery(array);
-        await update(updateQuery);
-      }
-      res.end('Done');
-    })
-    .catch( function(err) {
-      res.send( "Oops something went wrong: " + err);
-      console.log(err);
-    });
-} );
+  try {
+    const response = await query(myQuery);
+    const data = parseBindings(response.results.bindings);
+    const annotatedArray = generateAnnotatedArray(data);
+    const slicedArray = sliceArray(annotatedArray, 10);
+    for (let array of slicedArray) {
+      const updateQuery = generateUpdateQuery(array);
+      await update(updateQuery);
+    }
+    res.end("Done");
+  } catch (err) {
+    res.send("Oops something went wrong: " + err);
+    console.log(err);
+  }
+};
 
 export const sliceArray = (array, chunkSize) => {
   const result = [];
@@ -57,14 +66,13 @@ export const sliceArray = (array, chunkSize) => {
     result.push(chunk);
   }
   return result;
-}
+};
 
 function generateAnnotatedArray(data) {
-  
   return data.map((template) => {
     return {
       uri: template.uri,
-      annotated: includeMappings(template.templateValue, template.mappings)
+      annotated: includeMappings(template.templateValue, template.mappings),
     };
   });
 }
@@ -110,21 +118,21 @@ function generateDateTemplate(uri, name) {
 function includeMappings(html, mappings) {
   let finalHtml = html;
   for (let mapping of mappings) {
-    const regex = new RegExp(`\\\${${mapping.variable}}`, 'g');
-    if (mapping.type === 'instruction') {
+    const regex = new RegExp(`\\\${${mapping.variable}}`, "g");
+    if (mapping.type === "instruction") {
       continue;
-    } else if (mapping.type === 'codelist') {
+    } else if (mapping.type === "codelist") {
       const codeList = mapping.codelist;
       finalHtml = finalHtml.replace(
         regex,
         generateCodelistTemplate(mapping.uri, mapping.variable, codeList)
       );
-    } else if (mapping.type === 'location') {
+    } else if (mapping.type === "location") {
       finalHtml = finalHtml.replace(
         regex,
         generateLocationTemplate(mapping.uri, mapping.variable)
       );
-    } else if (mapping.type === 'date') {
+    } else if (mapping.type === "date") {
       finalHtml = finalHtml.replace(
         regex,
         generateDateTemplate(mapping.uri, mapping.variable)
@@ -139,25 +147,24 @@ function includeMappings(html, mappings) {
   return finalHtml;
 }
 
-
 function parseBindings(bindings) {
   const data = {};
-  for(let binding of bindings) {
+  for (let binding of bindings) {
     const uri = binding.uri.value;
     if (!data[uri]) {
       data[uri] = {
         uri: uri,
-        templateValue: binding.templateValue.value || '',
+        templateValue: binding.templateValue.value || "",
         mappings: [],
       };
     }
-    if(binding.mapping) {
+    if (binding.mapping) {
       const mapping = {
         uri: binding.mapping.value,
         type: binding.type.value,
         variable: binding.variable.value,
       };
-      if(binding.codelist) {
+      if (binding.codelist) {
         mapping.codelist = binding.codelist.value;
       }
       data[uri].mappings.push(mapping);
@@ -173,20 +180,33 @@ function parseBindings(bindings) {
 function generateUpdateQuery(annotatedArray) {
   return `
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
-    ${annotatedArray.map((template) => `
+    ${annotatedArray
+      .map(
+        (template) => `
       DELETE WHERE {
         GRAPH <http://mu.semte.ch/graphs/mow/registry> { 
           <${template.uri}> ext:annotated ?template.
         }
       };
-    `).join(' ')}
+    `
+      )
+      .join(" ")}
 
     INSERT DATA {
       GRAPH <http://mu.semte.ch/graphs/mow/registry> {
-        ${annotatedArray.map((template) => `<${template.uri}> ext:annotated ${sparqlEscapeString(template.annotated)}.`).join(' ')}
+        ${annotatedArray
+          .map(
+            (template) =>
+              `<${template.uri}> ext:annotated ${sparqlEscapeString(
+                template.annotated
+              )}.`
+          )
+          .join(" ")}
       }
     }
   `;
 }
+
+app.post("/fixAnnotated", fetchAndUpdateAnnotations);
 
 app.use(errorHandler);
