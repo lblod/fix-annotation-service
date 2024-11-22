@@ -1,7 +1,7 @@
 import { app, errorHandler, sparqlEscapeString } from "mu";
 import { querySudo as query, updateSudo as update } from "@lblod/mu-auth-sudo";
 
-app.get("/", function (req, res) {
+app.get("/", function (_req, res) {
   res.send("Hello mu-javascript-template");
 });
 
@@ -47,9 +47,9 @@ const fetchAndUpdateAnnotations = async (_req, res) => {
     const response = await query(myQuery);
     const data = parseBindings(response.results.bindings);
     const annotatedArray = generateAnnotatedArray(data);
-    const slicedArray = sliceArray(annotatedArray, 10);
-    for (let array of slicedArray) {
-      const updateQuery = generateUpdateQuery(array);
+    const chunkedAnnotatedArray = splitIntoChunks(annotatedArray, 10);
+    for (let chunkedTemplates of chunkedAnnotatedArray) {
+      const updateQuery = generateUpdateQuery(chunkedTemplates);
       await update(updateQuery);
     }
     res.end("Done");
@@ -59,10 +59,17 @@ const fetchAndUpdateAnnotations = async (_req, res) => {
   }
 };
 
-export const sliceArray = (array, chunkSize) => {
+/**
+ * Splits an array into chunks of a specified size.
+ *
+ * @param {Array} dataArray - The array to be split into chunks.
+ * @param {number} chunkSize - The size of each chunk.
+ * @returns {Array[]} An array containing the chunks.
+ */
+export const splitIntoChunks = (dataArray, chunkSize) => {
   const result = [];
-  for (let i = 0; i < array.length; i += chunkSize) {
-    let chunk = array.slice(i, i + chunkSize);
+  for (let i = 0; i < dataArray.length; i += chunkSize) {
+    let chunk = dataArray.slice(i, i + chunkSize);
     result.push(chunk);
   }
   return result;

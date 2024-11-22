@@ -17,7 +17,7 @@ const muMock = {
 };
 
 // Import the module with the mocked 'mu' dependency
-const { sliceArray } = await esmock.strict(
+const { splitIntoChunks } = await esmock.strict(
   "../app.js",
   { mu: muMock,"@lblod/mu-auth-sudo": {
       querySudo: querySudoStub,
@@ -29,12 +29,12 @@ const { sliceArray } = await esmock.strict(
   }
 );
 
-describe("sliceArray", () => {
+describe("splitIntoChunks", () => {
   it("should split array into chunks of specified size", () => {
     const array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     const chunkSize = 3;
     const expected = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]];
-    const result = sliceArray(array, chunkSize);
+    const result = splitIntoChunks(array, chunkSize);
     assert.deepStrictEqual(result, expected);
   });
 });
