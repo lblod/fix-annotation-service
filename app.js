@@ -1,54 +1,62 @@
 import { app, errorHandler, sparqlEscapeString } from 'mu';
 import { querySudo as query, updateSudo as update } from '@lblod/mu-auth-sudo';
 
-app.get('/', function( req, res ) {
-  res.send('Hello mu-javascript-template');
-} );
+const GET_TEMPLATES_QUERY = `
+  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  PREFIX dct: <http://purl.org/dc/terms/>
+  PREFIX prov: <http://www.w3.org/ns/prov#>
+  PREFIX mobiliteit: <https://data.vlaanderen.be/ns/mobiliteit#>
+  PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 
 
-app.post('/fixAnnotated', function( req, res ) {
-  var myQuery = `
-    PREFIX ex: <http://example.org#>
-    PREFIX lblodMobilitiet: <http://data.lblod.info/vocabularies/mobiliteit/>
-    PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
-    PREFIX sh: <http://www.w3.org/ns/shacl#>
-    PREFIX oslo: <http://data.vlaanderen.be/ns#>
-    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-    PREFIX org: <http://www.w3.org/ns/org#>
-    PREFIX mobiliteit: <https://data.vlaanderen.be/ns/mobiliteit#>
-
-  SELECT DISTINCT ?uri ?templateValue ?mapping ?type ?variable ?codelist WHERE {
-    ?uri a ext:Template;
-    ext:value ?templateValue.
+  SELECT DISTINCT ?uri ?templateValue  ?type ?variableUri ?variableLabel ?variableValue ?variableDefaultValue ?codelist WHERE {
+    ?uri a mobiliteit:Template;
+    prov:value ?templateValue.
 
 
   OPTIONAL {
-    ?uri ext:mapping ?mapping.
-    ?mapping ext:variableType ?type;
-            ext:variable ?variable.
+    ?uri mobiliteit:variabele ?variableUri.
+    ?variableUri dct:type ?type.
     OPTIONAL {
-      ?mapping ext:codeList ?codelist.
+      ?variableUri dct:title ?variableLabel.
+    }
+    OPTIONAL {
+      ?variableUri rdfs:value ?variableValue.
+    }
+    OPTIONAL {
+      ?variableUri mobiliteit:standaardwaarde ?variableDefaultValue.
+    }
+ 
+    OPTIONAL {
+      ?variableUri ext:codeList ?codelist.
     }
   }
 
   }`;
 
-  query( myQuery )
-    .then( async function(response) {
-      const data = parseBindings(response.results.bindings);
-      const annotatedArray = generateAnnotatedArray(data);
-      const slicedArray = sliceArray(annotatedArray, 10);
-      for(let array of slicedArray) {
-        const updateQuery = generateUpdateQuery(array);
-        await update(updateQuery);
-      }
-      res.end('Done');
-    })
-    .catch( function(err) {
-      res.send( "Oops something went wrong: " + err);
-      console.log(err);
-    });
-} );
+app.get('/', function (_, res) {
+  res.send('Hello mu-javascript-template');
+});
+
+app.post('/fixAnnotated', async function (_, res) {
+
+  try {
+    const response = await query(GET_TEMPLATES_QUERY);
+    const data = parseBindings(response.results.bindings);
+    const annotatedArray = generateAnnotatedArray(data);
+    const slicedArray = sliceArray(annotatedArray, 10);
+    for (const array of slicedArray) {
+      const updateQuery = generateUpdateQuery(array);
+      await update(updateQuery);
+    }
+    res.end('Done');
+
+  } catch (err) {
+    console.log(err);
+    res.send("Oops something went wrong: " + err);
+  }
+
+});
 
 function sliceArray(array, chunkSize) {
   const result = [];
@@ -60,79 +68,85 @@ function sliceArray(array, chunkSize) {
 }
 
 function generateAnnotatedArray(data) {
-  
+
   return data.map((template) => {
     return {
       uri: template.uri,
-      annotated: includeMappings(template.templateValue, template.mappings)
+      annotated: includeVariables(template.templateValue, template.variables)
     };
   });
 }
 
-function generateTextTemplate(uri, name) {
+function generateTextTemplate(uri, value, defaultValue) {
   return `
-    <span typeof="ext:Mapping" resource="${uri}">
-      <span class="mark-highlight-manual">\${${name}}</span>
+    <span typeof="mobiliteit:Variabele" resource="${uri}">
+      <span class="mark-highlight-manual" property="rdfs:value">\${${value}}</span>
+      ${!defaultValue?.length ? "" : `<span property="mobiliteit:standaardwaarde">${defaultValue}</span>`}
     </span>
   `;
 }
 
-function generateCodelistTemplate(uri, name, codelist) {
+function generateCodelistTemplate(uri, value, defaultValue, codelist) {
   return `
-    <span resource="${uri}" typeof="ext:Mapping">
+    <span resource="${uri}" typeof="mobiliteit:Variabele">
       <span property="dct:source" resource="${process.env.SPARQL_ENDPOINT}"></span>
       <span property="dct:type" content="codelist"></span>
       <span property="ext:codelist" resource="${codelist}"></span>
-      <span property="ext:content">\${${name}}</span>
+      <span property="rdfs:value">\${${value}}</span>
+      ${!defaultValue?.length ? "" : `<span property="mobiliteit:standaardwaarde">${defaultValue}</span>`}
     </span>
   `;
 }
 
-function generateLocationTemplate(uri, name) {
+function generateLocationTemplate(uri, value, defaultValue) {
   return `
-    <span resource="${uri}" typeof="ext:Mapping">
+    <span resource="${uri}" typeof="mobiliteit:Variabele">
       <span property="dct:source" resource="${process.env.SPARQL_ENDPOINT}"></span>
       <span property="dct:type" content="location"></span>
-      <span property="ext:content">\${${name}}</span>
+      <span property="rdfs:value">\${${value}}</span>
+      ${!defaultValue?.length ? "" : `<span property="mobiliteit:standaardwaarde">${defaultValue}</span>`}
+
     </span>
   `;
 }
 
-function generateDateTemplate(uri, name) {
+function generateDateTemplate(uri, value, defaultValue) {
   return `
-    <span resource="${uri}" typeof="ext:Mapping">
+    <span resource="${uri}" typeof="mobiliteit:Variabele">
       <span property="dct:type" content="date"></span>
-      <span property="ext:content" datatype="xsd:date">\${${name}}</span>
+      <span property="rdfs:value" datatype="xsd:date">\${${value}}</span>
+      ${!defaultValue?.length ? "" : `<span property="mobiliteit:standaardwaarde">${defaultValue}</span>`}
+
     </span>
   `;
 }
 
-function includeMappings(html, mappings) {
+function includeVariables(html, variables) {
   let finalHtml = html;
-  for (let mapping of mappings) {
-    const regex = new RegExp(`\\\${${mapping.variable}}`, 'g');
-    if (mapping.type === 'instruction') {
+  for (let variable of variables) {
+    const regex = new RegExp(`\\\${${variable.value}}`, 'g');
+    if (variable.type === 'instruction') {
       continue;
-    } else if (mapping.type === 'codelist') {
-      const codeList = mapping.codelist;
+    } else if (variable.type === 'codelist') {
+      const codeList = variable.codelist;
       finalHtml = finalHtml.replace(
         regex,
-        generateCodelistTemplate(mapping.uri, mapping.variable, codeList)
+        generateCodelistTemplate(variable.uri, variable.value, variable.defaultValue, codeList)
       );
-    } else if (mapping.type === 'location') {
+    } else if (variable.type === 'location') {
       finalHtml = finalHtml.replace(
         regex,
-        generateLocationTemplate(mapping.uri, mapping.variable)
+        generateLocationTemplate(variable.uri, variable.value, variable.defaultValue)
       );
-    } else if (mapping.type === 'date') {
+    } else if (variable.type === 'date') {
       finalHtml = finalHtml.replace(
         regex,
-        generateDateTemplate(mapping.uri, mapping.variable)
+        generateDateTemplate(variable.uri, variable.value, variable.defaultValue)
       );
     } else {
       finalHtml = finalHtml.replace(
         regex,
-        generateTextTemplate(mapping.uri, mapping.variable)
+        generateTextTemplate(variable.uri, variable.value, variable.defaultValue)
       );
     }
   }
@@ -142,25 +156,25 @@ function includeMappings(html, mappings) {
 
 function parseBindings(bindings) {
   const data = {};
-  for(let binding of bindings) {
+  for (const binding of bindings) {
     const uri = binding.uri.value;
     if (!data[uri]) {
       data[uri] = {
         uri: uri,
-        templateValue: binding.templateValue.value || '',
-        mappings: [],
+        templateValue: binding.templateValue?.value || '',
+        variables: [],
       };
     }
-    if(binding.mapping) {
-      const mapping = {
-        uri: binding.mapping.value,
+    if (binding.variableUri) {
+      const variable = {
         type: binding.type.value,
-        variable: binding.variable.value,
+        uri: binding.variableUri.value,
+        label: binding.variableLabel?.value,
+        value: binding.variableValue?.value,
+        defaultValue: binding.variableDefaultValue?.value,
+        codelist: binding.codelist?.value
       };
-      if(binding.codelist) {
-        mapping.codelist = binding.codelist.value;
-      }
-      data[uri].mappings.push(mapping);
+      data[uri].variables.push(variable);
     }
   }
   const dataArray = [];
