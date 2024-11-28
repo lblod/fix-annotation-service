@@ -1,120 +1,6 @@
 import assert from "assert";
 import esmock from "esmock";
 
-// 1. Mock the response from the SPARQL query
-import templateReponse from "./mocks/select-template-response.json" assert { type: "json" };
-// 2. Paresed bindings from the response
-const parsedBinding = [
-  {
-    uri: "http://data.lblod.info/templates/6486F5D34E5B47D5A3A1EDDF",
-    templateValue:
-      "${locatie} abc, ${autonummer} dan ${tekst} codelijst van ${codelijst} en ook nog is een datum eh ${datum} ${cijferstesten}",
-    mappings: [
-      {
-        uri: "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE6",
-        type: "codelist",
-        variable: "codelijst",
-        codelist:
-          "http://lblod.data.gift/concept-schemes/61C054CEE3249100080000B9",
-      },
-      {
-        uri: "http://data.lblod.info/mappings/649D79A34E5B47D5A3A1EE0F",
-        type: "number",
-        variable: "cijferstesten",
-      },
-      {
-        uri: "http://data.lblod.info/mappings/6486F5D44E5B47D5A3A1EDE3",
-        type: "location",
-        variable: "locatie",
-      },
-      {
-        uri: "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE4",
-        type: "number",
-        variable: "autonummer",
-      },
-      {
-        uri: "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE5",
-        type: "text",
-        variable: "tekst",
-      },
-      {
-        uri: "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE7",
-        type: "date",
-        variable: "datum",
-      },
-    ],
-  },
-  {
-    mappings: [],
-    templateValue: "de bestuurders hebben voorrang",
-    uri: "http://data.lblod.info/templates/1907fb2e-b36c-45b1-9a69-e2c367f4fb28",
-  },
-];
-// 3. Annotated array to be generated
-const annotatedArray = [
-  {
-    uri: "http://data.lblod.info/templates/6486F5D34E5B47D5A3A1EDDF",
-    annotated:
-      '\n    <span resource="http://data.lblod.info/mappings/6486F5D44E5B47D5A3A1EDE3" typeof="ext:Mapping">\n      <span property="dct:source" resource="undefined"></span>\n      <span property="dct:type" content="location"></span>\n      <span property="ext:content">${locatie}</span>\n    </span>\n   abc, \n    <span typeof="ext:Mapping" resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE4">\n      <span class="mark-highlight-manual">${autonummer}</span>\n    </span>\n   dan \n    <span typeof="ext:Mapping" resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE5">\n      <span class="mark-highlight-manual">${tekst}</span>\n    </span>\n   codelijst van \n    <span resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE6" typeof="ext:Mapping">\n      <span property="dct:source" resource="undefined"></span>\n      <span property="dct:type" content="codelist"></span>\n      <span property="ext:codelist" resource="http://lblod.data.gift/concept-schemes/61C054CEE3249100080000B9"></span>\n      <span property="ext:content">${codelijst}</span>\n    </span>\n   en ook nog is een datum eh \n    <span resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE7" typeof="ext:Mapping">\n      <span property="dct:type" content="date"></span>\n      <span property="ext:content" datatype="xsd:date">${datum}</span>\n    </span>\n   \n    <span typeof="ext:Mapping" resource="http://data.lblod.info/mappings/649D79A34E5B47D5A3A1EE0F">\n      <span class="mark-highlight-manual">${cijferstesten}</span>\n    </span>\n  ',
-  },
-  {
-    uri: "http://data.lblod.info/templates/1907fb2e-b36c-45b1-9a69-e2c367f4fb28",
-    annotated: "de bestuurders hebben voorrang",
-  },
-];
-// 4. Update query to be generated
-const UpdateQuery = `
-PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
-    
-DELETE WHERE {
-  GRAPH <http://mu.semte.ch/graphs/mow/registry> { 
-    <http://data.lblod.info/templates/6486F5D34E5B47D5A3A1EDDF> ext:annotated ?template .
-  }
-}; 
-DELETE WHERE {
-  GRAPH <http://mu.semte.ch/graphs/mow/registry> { 
-    <http://data.lblod.info/templates/1907fb2e-b36c-45b1-9a69-e2c367f4fb28> ext:annotated ?template .
-  }
-};
-
-INSERT DATA {
-  GRAPH <http://mu.semte.ch/graphs/mow/registry> {
-    <http://data.lblod.info/templates/6486F5D34E5B47D5A3A1EDDF> ext:annotated 
-      <span resource="http://data.lblod.info/mappings/6486F5D44E5B47D5A3A1EDE3" typeof="ext:Mapping">
-      <span property="dct:source" resource="undefined"></span>
-      <span property="dct:type" content="location"></span>
-      <span property="ext:content">\${locatie}</span>
-      </span>
-      abc, 
-      <span typeof="ext:Mapping" resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE4">
-      <span class="mark-highlight-manual">\${autonummer}</span>
-      </span>
-      dan 
-      <span typeof="ext:Mapping" resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE5">
-      <span class="mark-highlight-manual">\${tekst}</span>
-      </span>
-      codelijst van 
-      <span resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE6" typeof="ext:Mapping">
-      <span property="dct:source" resource="undefined"></span>
-      <span property="dct:type" content="codelist"></span>
-      <span property="ext:codelist" resource="http://lblod.data.gift/concept-schemes/61C054CEE3249100080000B9"></span>
-      <span property="ext:content">\${codelijst}</span>
-      </span>
-      en ook nog is een datum eh 
-      <span resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE7" typeof="ext:Mapping">
-      <span property="dct:type" content="date"></span>
-      <span property="ext:content" datatype="xsd:date">\${datum}</span>
-      </span>
-
-      <span typeof="ext:Mapping" resource="http://data.lblod.info/mappings/649D79A34E5B47D5A3A1EE0F">
-      <span class="mark-highlight-manual">\${cijferstesten}</span>
-      </span>
-      .
-    <http://data.lblod.info/templates/1907fb2e-b36c-45b1-9a69-e2c367f4fb28> ext:annotated de bestuurders hebben voorrang .
-
-  }
-}`;
-
 // Mock the 'mu' module
 const muMock = {
   app: {
@@ -123,7 +9,7 @@ const muMock = {
     use: () => {},
   },
   errorHandler: () => {},
-  sparqlEscapeString: (str) => str,
+  sparqlEscapeString: (str) => `"""${str}"""`,
 };
 
 // Import the module with the mocked 'mu' dependency
@@ -141,12 +27,127 @@ const {
       querySudo: () => {},
       updateSudo: () => {},
     },
+    "../config.js": {
+      SPARQL_ENDPOINT: "http://example.com/sparql",
+    },
   },
   {},
   {
     isModuleNotFoundError: false,
   }
 );
+
+// 1. Mock the response from the SPARQL query
+import templateReponse from "./mocks/select-template-response.json" assert { type: "json" };
+// 2. Paresed bindings from the response
+const parsedBinding = [
+  {
+    uri: "http://data.lblod.info/templates/67476E5D5A9960633226D2AB",
+    templateValue:
+      "${locatie} abc, ${autonummer} dan ${tekst} codelijst van ${codelijst} en ook nog is een datum eh ${datum} ${cijferstesten}",
+    variables: [
+      {
+        uri: "http://data.lblod.info/variables/67476E5D5A9960633226D2AF",
+        type: "codelist",
+        value: "codelijst",
+        codelist:
+          "http://lblod.data.gift/concept-schemes/63B58F51867176EC5DDD14C9",
+      },
+      {
+        uri: "http://data.lblod.info/variables/67476E5E5A9960633226D2B0",
+        type: "date",
+        value: "datum",
+      },
+      {
+        uri: "http://data.lblod.info/variables/67476E5D5A9960633226D2AC",
+        type: "location",
+        value: "locatie",
+      },
+      {
+        uri: "http://data.lblod.info/variables/67476E5D5A9960633226D2AD",
+        type: "number",
+        value: "autonummer",
+      },
+      {
+        uri: "http://data.lblod.info/variables/67476E5D5A9960633226D2AE",
+        type: "text",
+        value: "tekst",
+      },
+      {
+        uri: "http://data.lblod.info/variables/67476E5E5A9960633226D2B1",
+        type: "number",
+        value: "cijferstesten",
+      },
+    ],
+  },
+  {
+    templateValue: "de fietszone wordt afgebakend",
+    uri: "http://data.lblod.info/templates/643003B35BDCDA240120BDCB",
+    variables: [],
+  },
+];
+// 3. Annotated array to be generated
+const annotatedArray = [
+  {
+    uri: "http://data.lblod.info/templates/67476E5D5A9960633226D2AB",
+    annotated:
+      '\n    <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AC" typeof="mobiliteit:Variabele">\n      <span property="dct:type" content="location"></span>\n      <span property="dct:source" resource="http://example.com/sparql"></span>\n      <span class="mark-highlight-manual" property="rdfs:value">${locatie}</span>\n      \n    </span>\n   abc, \n    <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AD" typeof="mobiliteit:Variabele">\n      <span class="mark-highlight-manual" property="rdfs:value">${autonummer}</span>\n      \n    </span>\n   dan \n    <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AE" typeof="mobiliteit:Variabele">\n      <span class="mark-highlight-manual" property="rdfs:value">${tekst}</span>\n      \n    </span>\n   codelijst van \n    <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AF" typeof="mobiliteit:Variabele">\n      <span property="dct:type" content="codelist"></span>\n      <span property="dct:source" resource="http://example.com/sparql"></span>\n      <span property="ext:codelist" resource="http://lblod.data.gift/concept-schemes/63B58F51867176EC5DDD14C9"></span>\n      <span class="mark-highlight-manual" property="rdfs:value">${codelijst}</span>\n      \n    </span>\n   en ook nog is een datum eh \n    <span resource="http://data.lblod.info/variables/67476E5E5A9960633226D2B0" typeof="mobiliteit:Variabele">\n      <span property="dct:type" content="date"></span>\n      <span class="mark-highlight-manual" property="rdfs:value" datatype="xsd:date">${datum}</span>\n      \n    </span>\n   \n    <span resource="http://data.lblod.info/variables/67476E5E5A9960633226D2B1" typeof="mobiliteit:Variabele">\n      <span class="mark-highlight-manual" property="rdfs:value">${cijferstesten}</span>\n      \n    </span>\n  ',
+  },
+  {
+    uri: "http://data.lblod.info/templates/643003B35BDCDA240120BDCB",
+    annotated: "de fietszone wordt afgebakend",
+  },
+];
+// 4. Update query to be generated
+const UpdateQuery = `
+PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
+    
+DELETE WHERE {
+  GRAPH <http://mu.semte.ch/graphs/mow/registry> { 
+    <http://data.lblod.info/templates/67476E5D5A9960633226D2AB> ext:annotated ?template .
+  }
+}; 
+DELETE WHERE {
+  GRAPH <http://mu.semte.ch/graphs/mow/registry> { 
+    <http://data.lblod.info/templates/643003B35BDCDA240120BDCB> ext:annotated ?template .
+  }
+};
+
+INSERT DATA {
+  GRAPH <http://mu.semte.ch/graphs/mow/registry> {
+    <http://data.lblod.info/templates/67476E5D5A9960633226D2AB> ext:annotated """ 
+      <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AC" typeof="mobiliteit:Variabele">
+        <span property="dct:type" content="location"></span>
+        <span property="dct:source" resource="http://example.com/sparql"></span>
+        <span class="mark-highlight-manual" property="rdfs:value">\${locatie}</span>
+      </span>
+      abc,
+      <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AD" typeof="mobiliteit:Variabele">
+        <span class="mark-highlight-manual" property="rdfs:value">\${autonummer}</span>
+      </span>
+      dan
+      <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AE" typeof="mobiliteit:Variabele">
+        <span class="mark-highlight-manual" property="rdfs:value">\${tekst}</span>
+      </span>
+      codelijst van
+      <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AF" typeof="mobiliteit:Variabele">
+        <span property="dct:type" content="codelist"></span>
+        <span property="dct:source" resource="http://example.com/sparql"></span>
+        <span property="ext:codelist" resource="http://lblod.data.gift/concept-schemes/63B58F51867176EC5DDD14C9"></span>
+        <span class="mark-highlight-manual" property="rdfs:value">\${codelijst}</span>
+      </span>
+      en ook nog is een datum eh
+      <span resource="http://data.lblod.info/variables/67476E5E5A9960633226D2B0" typeof="mobiliteit:Variabele">
+        <span property="dct:type" content="date"></span>
+        <span class="mark-highlight-manual" property="rdfs:value" datatype="xsd:date">\${datum}</span>
+      </span>
+      <span resource="http://data.lblod.info/variables/67476E5E5A9960633226D2B1" typeof="mobiliteit:Variabele">
+        <span class="mark-highlight-manual" property="rdfs:value">\${cijferstesten}</span>
+      </span> """
+      .
+    <http://data.lblod.info/templates/643003B35BDCDA240120BDCB> ext:annotated """de fietszone wordt afgebakend""" .
+  }
+}`;
 
 // Normalize strings by removing extra whitespace and trimming
 const normalize = (str) => str.replace(/\s+/g, " ").trim();
@@ -172,68 +173,86 @@ describe("applyTemplateMappings", () => {
       uri: "http://example.com",
       templateValue:
         "${locatie} abc, ${autonummer} dan ${tekst} codelijst van ${codelijst} en ook nog is een datum eh ${datum} ${cijferstesten}",
-      mappings: [
+      variables: [
         {
           uri: "http://data.lblod.info/mappings/6486F5D44E5B47D5A3A1EDE3",
-          variable: "locatie",
-          variableType: "location",
+          value: "locatie",
+          type: "location",
+          defaultValue: "Locatie_1",
         },
         {
           uri: "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE4",
-          variable: "autonummer",
-          variableType: "number",
+          value: "autonummer",
+          type: "number",
+          defaultValue: "123",
         },
         {
           uri: "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE5",
-          variable: "tekst",
-          variableType: "text",
+          value: "tekst",
+          type: "text",
+          defaultValue: "Tekst_1",
         },
         {
           uri: "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE6",
-          variable: "codelijst",
-          variableType: "codelist",
+          value: "codelijst",
+          type: "codelist",
           codelist:
             "http://lblod.data.gift/concept-schemes/61C054CEE3249100080000B9",
+          defaultValue: "Codelijst_1",
         },
         {
           uri: "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE7",
-          variable: "datum",
-          variableType: "date",
+          value: "datum",
+          type: "date",
+          defaultValue: "2021-01-01",
         },
         {
           uri: "http://data.lblod.info/mappings/649D79A34E5B47D5A3A1EE0F",
-          variable: "cijferstesten",
-          variableType: "number",
+          value: "cijferstesten",
+          type: "number",
+          defaultValue: "456",
         },
       ],
     };
     const expected = `
-      <span typeof="ext:Mapping" resource="http://data.lblod.info/mappings/6486F5D44E5B47D5A3A1EDE3">
-        <span class="mark-highlight-manual">\${locatie}</span>
+      <span resource="http://data.lblod.info/mappings/6486F5D44E5B47D5A3A1EDE3" typeof="mobiliteit:Variabele">
+        <span property="dct:type" content="location"></span>  
+        <span property="dct:source" resource="http://example.com/sparql"></span>
+        <span class="mark-highlight-manual" property="rdfs:value">\${locatie}</span>
+        <span property="mobiliteit:standaardwaarde">Locatie_1</span>
       </span>
       abc, 
-      <span typeof="ext:Mapping" resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE4">
-        <span class="mark-highlight-manual">\${autonummer}</span>
+      <span resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE4" typeof="mobiliteit:Variabele">
+        <span class="mark-highlight-manual" property="rdfs:value">\${autonummer}</span>
+        <span property="mobiliteit:standaardwaarde">123</span>
       </span>
       dan 
-      <span typeof="ext:Mapping" resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE5">
-        <span class="mark-highlight-manual">\${tekst}</span>
+      <span resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE5" typeof="mobiliteit:Variabele">
+        <span class="mark-highlight-manual" property="rdfs:value">\${tekst}</span>
+        <span property="mobiliteit:standaardwaarde">Tekst_1</span>
       </span>
       codelijst van 
-      <span typeof="ext:Mapping" resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE6">
-        <span class="mark-highlight-manual">\${codelijst}</span>
+      <span resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE6" typeof="mobiliteit:Variabele">
+        <span property="dct:type" content="codelist"></span>   
+        <span property="dct:source" resource="http://example.com/sparql"></span>
+        <span property="ext:codelist" resource="http://lblod.data.gift/concept-schemes/61C054CEE3249100080000B9"></span>
+        <span class="mark-highlight-manual" property="rdfs:value">\${codelijst}</span>
+        <span property="mobiliteit:standaardwaarde">Codelijst_1</span>
       </span>
       en ook nog is een datum eh 
-      <span typeof="ext:Mapping" resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE7">
-        <span class="mark-highlight-manual">\${datum}</span>
+      <span resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE7" typeof="mobiliteit:Variabele">
+        <span property="dct:type" content="date"></span>  
+        <span class="mark-highlight-manual" property="rdfs:value" datatype="xsd:date">\${datum}</span>
+        <span property="mobiliteit:standaardwaarde" datatype="xsd:date">2021-01-01</span>
       </span>
       
-      <span typeof="ext:Mapping" resource="http://data.lblod.info/mappings/649D79A34E5B47D5A3A1EE0F">
-        <span class="mark-highlight-manual">\${cijferstesten}</span>
+      <span resource="http://data.lblod.info/mappings/649D79A34E5B47D5A3A1EE0F" typeof="mobiliteit:Variabele">
+        <span class="mark-highlight-manual" property="rdfs:value">\${cijferstesten}</span>
+        <span property="mobiliteit:standaardwaarde">456</span>
       </span>`;
     const result = applyTemplateMappings(
       template.templateValue,
-      template.mappings
+      template.variables
     );
     assert.strictEqual(normalize(result), normalize(expected));
   });
