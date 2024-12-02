@@ -1,2 +1,2 @@
-FROM semtech/mu-javascript-template
-LABEL maintainer="oscar.rodriguez@redpencil.io"
+FROM semtech/mu-javascript-template:1.8.0
+LABEL maintainer="redpencil.io <info@repdencil.io>"
