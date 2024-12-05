@@ -14,7 +14,7 @@ const muMock = {
 
 // Import the module with the mocked 'mu' dependency
 const {
-  parseBindings,
+  parseSelectTemplateBindings,
   applyTemplateMappings,
   generateAnnotatedArray,
   splitIntoChunks,
@@ -156,13 +156,13 @@ describe("parseBindings", () => {
   it("should parse bindings correctly", () => {
     const response = templateReponse;
     const expected = parsedBinding;
-    const result = parseBindings(response.results.bindings);
+    const result = parseSelectTemplateBindings(response.results.bindings);
     assert.deepStrictEqual(result, expected);
   });
 
   it("should return empty array if no bindings are provided", () => {
     const response = { results: { bindings: [] } };
-    const result = parseBindings(response.results.bindings);
+    const result = parseSelectTemplateBindings(response.results.bindings);
     assert.deepStrictEqual(result, []);
   });
 });
