@@ -22,11 +22,11 @@ import { SPARQL_ENDPOINT } from "./config.js";
 
 /**
  * Fetches template data from the SPARQL endpoint.
- * 
+ *
  * @returns {Promise<SparqlSelectTemplatesResponse>} The response object containing the bindings.
  */
 const fetchTemplateData = async () => {
-  var myQuery = `
+  const selectTemplateQuery = `
   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
   PREFIX dct: <http://purl.org/dc/terms/>
   PREFIX prov: <http://www.w3.org/ns/prov#>
@@ -53,7 +53,7 @@ const fetchTemplateData = async () => {
   }
   `;
 
-  return query(myQuery);
+  return query(selectTemplateQuery);
 };
 
 /**
@@ -76,7 +76,7 @@ const fetchTemplateData = async () => {
  * @param {SparqlSelectTemplatesBinding[]} bindings - The bindings to be parsed.
  * @returns {Template[]} An array containing the parsed bindings.
  */
-export const parseBindings = (bindings) => {
+export const parseSelectTemplateBindings = (bindings) => {
   const data = {};
   for (const binding of bindings) {
     const uri = binding.uri.value;
@@ -96,8 +96,12 @@ export const parseBindings = (bindings) => {
         uri: binding.variableUri.value,
         value: binding.variableValue.value,
         type: binding.variableType.value,
-        ...(binding.variableDefaultValue && { defaultValue: binding.variableDefaultValue.value }),
-        ...(binding.variableCodelist && { codelist: binding.variableCodelist.value }),
+        ...(binding.variableDefaultValue && {
+          defaultValue: binding.variableDefaultValue.value,
+        }),
+        ...(binding.variableCodelist && {
+          codelist: binding.variableCodelist.value,
+        }),
       };
 
       data[uri].variables.push(variable);
@@ -125,25 +129,29 @@ export const splitIntoChunks = (dataArray, chunkSize) => {
 
 /**
  * Generates a text template.
- * 
+ *
  * @param {Object} variable - The object containing the variable data.
  * @param {string} variable.uri - The URI of the variable.
  * @param {string} variable.value - The name of the variable.
  * @param {string} [variable.defaultValue] - The default value of the variable (optional).
  * @returns {string} The text template string.
  */
-const generateTextTemplate = ({uri, value, defaultValue}) => {
+const generateTextTemplate = ({ uri, value, defaultValue }) => {
   return `
     <span resource="${uri}" typeof="mobiliteit:Variabele">
       <span class="mark-highlight-manual" property="rdfs:value">\${${value}}</span>
-      ${!defaultValue?.length ? "" : `<span property="mobiliteit:standaardwaarde">${defaultValue}</span>`}
+      ${
+        !defaultValue?.length
+          ? ""
+          : `<span property="mobiliteit:standaardwaarde">${defaultValue}</span>`
+      }
     </span>
   `;
 };
 
 /**
  * Generates a codelist template.
- * 
+ *
  * @param {Object} variable - The object containing the variable data.
  * @param {string} variable.uri - The URI of the variable.
  * @param {string} variable.value - The name of the variable.
@@ -151,21 +159,31 @@ const generateTextTemplate = ({uri, value, defaultValue}) => {
  * @param {string} variable.source - The source of the variable.
  * @param {string} [variable.defaultValue] - The default value of the variable (optional).
  */
-const generateCodelistTemplate = ({uri, value, codelist, source, defaultValue}) => {
+const generateCodelistTemplate = ({
+  uri,
+  value,
+  codelist,
+  source,
+  defaultValue,
+}) => {
   return `
     <span resource="${uri}" typeof="mobiliteit:Variabele">
       <span property="dct:type" content="codelist"></span>
       <span property="dct:source" resource="${source}"></span>
       <span property="ext:codelist" resource="${codelist}"></span>
       <span class="mark-highlight-manual" property="rdfs:value">\${${value}}</span>
-      ${!defaultValue?.length ? "" : `<span property="mobiliteit:standaardwaarde">${defaultValue}</span>`}
+      ${
+        !defaultValue?.length
+          ? ""
+          : `<span property="mobiliteit:standaardwaarde">${defaultValue}</span>`
+      }
     </span>
   `;
 };
 
 /**
  * Generates a location template.
- * 
+ *
  * @param {Object} variable - The object containing the variable data.
  * @param {string} variable.uri - The URI of the variable.
  * @param {string} variable.value - The name of the variable.
@@ -173,32 +191,40 @@ const generateCodelistTemplate = ({uri, value, codelist, source, defaultValue}) 
  * @param {string} [variable.defaultValue] - The default value of the variable (optional).
  * @returns {string} The location template string.
  */
-const generateLocationTemplate = ({uri, value, source, defaultValue}) => {
+const generateLocationTemplate = ({ uri, value, source, defaultValue }) => {
   return `
     <span resource="${uri}" typeof="mobiliteit:Variabele">
       <span property="dct:type" content="location"></span>
       <span property="dct:source" resource="${source}"></span>
       <span class="mark-highlight-manual" property="rdfs:value">\${${value}}</span>
-      ${!defaultValue?.length ? "" : `<span property="mobiliteit:standaardwaarde">${defaultValue}</span>`}
+      ${
+        !defaultValue?.length
+          ? ""
+          : `<span property="mobiliteit:standaardwaarde">${defaultValue}</span>`
+      }
     </span>
   `;
 };
 
 /**
  * Generates a date template.
- * 
+ *
  * @param {Object} variable - The object containing the variable data.
  * @param {string} variable.uri - The URI of the variable.
  * @param {string} variable.value - The name of the variable.
  * @param {string} [variable.defaultValue] - The default value of the variable (optional).
  * @returns {string} The date template string.
  */
-const generateDateTemplate = ({uri, value, defaultValue}) => {
+const generateDateTemplate = ({ uri, value, defaultValue }) => {
   return `
     <span resource="${uri}" typeof="mobiliteit:Variabele">
       <span property="dct:type" content="date"></span>
       <span class="mark-highlight-manual" property="rdfs:value" datatype="xsd:date">\${${value}}</span>
-      ${!defaultValue?.length ? "" : `<span property="mobiliteit:standaardwaarde" datatype="xsd:date">${defaultValue}</span>`}
+      ${
+        !defaultValue?.length
+          ? ""
+          : `<span property="mobiliteit:standaardwaarde" datatype="xsd:date">${defaultValue}</span>`
+      }
     </span>
   `;
 };
@@ -217,24 +243,23 @@ export const applyTemplateMappings = (basicTemplate, variables) => {
     codelist: (variable) =>
       generateCodelistTemplate({
         ...variable,
-        source: SPARQL_ENDPOINT
+        source: SPARQL_ENDPOINT,
       }),
     location: (variable) =>
       generateLocationTemplate({
         ...variable,
-        source: SPARQL_ENDPOINT
-      }
-      ),
+        source: SPARQL_ENDPOINT,
+      }),
     date: generateDateTemplate,
     default: generateTextTemplate,
   };
   for (const variable of variables) {
     if (variable.type === "instruction") continue;
-    
+
     const regex = new RegExp(`\\\${${variable.value}}`, "g");
     const generator =
-    templateGenerators[variable.type] || templateGenerators.default;
-    
+      templateGenerators[variable.type] || templateGenerators.default;
+
     annotatedTemplate = annotatedTemplate.replace(regex, generator(variable));
   }
 
@@ -247,13 +272,10 @@ export const applyTemplateMappings = (basicTemplate, variables) => {
  * @returns {Object[]} An array containing the annotated templates.
  */
 export const generateAnnotatedArray = (templates) => {
-  return templates.map(({uri, templateValue, variables}) => {
+  return templates.map(({ uri, templateValue, variables }) => {
     return {
       uri,
-      annotated: applyTemplateMappings(
-        templateValue,
-        variables
-      ),
+      annotated: applyTemplateMappings(templateValue, variables),
     };
   });
 };
@@ -301,7 +323,7 @@ export const generateUpdateQuery = (annotatedArray) => {
 const fetchAndUpdateAnnotations = async (_req, res) => {
   try {
     const response = await fetchTemplateData();
-    const data = parseBindings(response.results.bindings);
+    const data = parseSelectTemplateBindings(response.results.bindings);
     const annotatedArray = generateAnnotatedArray(data);
     const chunkedAnnotatedArray = splitIntoChunks(annotatedArray, 10);
     for (let chunkedTemplates of chunkedAnnotatedArray) {
@@ -315,6 +337,73 @@ const fetchAndUpdateAnnotations = async (_req, res) => {
   }
 };
 
+/**
+ * Fetches all annotated templates from the registry graph.
+ * @returns {Promise<string[]>} An array containing the URIs of the annotated templates.
+ */
+const fetchAllTemplatesAnnotated = async () => {
+  const selectTemplateAnnotatedQuery = `
+  PREFIX mobiliteit: <https://data.vlaanderen.be/ns/mobiliteit#>
+  PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
+
+  SELECT DISTINCT ?uri WHERE {
+    GRAPH <http://mu.semte.ch/graphs/mow/registry> {
+      ?uri a mobiliteit:Template ;
+        ext:annotated ?annotated .
+    }
+  }
+  `;
+
+  const response = await query(selectTemplateAnnotatedQuery);
+
+  return response.results.bindings.map((binding) => binding.uri.value);
+};
+
+/**
+ * Return delete annotated templates query.
+ * @param {string[]} uris - The array containing the uris of the annotated templates.
+ * @returns {string} The query string.
+ */
+const deleteChuckQuery = (uris) => {
+  return uris
+    .map(
+      (uri) =>
+        `DELETE WHERE {
+          GRAPH <http://mu.semte.ch/graphs/mow/registry> {
+            <${uri}> ext:annotated ?template .
+          }
+        };\n`
+    )
+    .join(" ");
+};
+
+/**
+ * Resets all annotated templates in the registry graph.
+ */
+const clearAnnotatedTemplate = async (_req, res) => {
+  try {
+    const response = await fetchAllTemplatesAnnotated();
+    const chunked = splitIntoChunks(response, 10);
+
+    for (let uris of chunked) {
+      const updateQuery = `
+      PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
+
+      ${deleteChuckQuery(uris)}
+      `;
+
+      await update(updateQuery);
+    }
+
+    res.end("Done");
+  } catch (err) {
+    res.send("Oops something went wrong: " + err);
+    console.error(err);
+  }
+};
+
 app.post("/fixAnnotated", fetchAndUpdateAnnotations);
+
+app.post("/clear-annotated", clearAnnotatedTemplate);
 
 app.use(errorHandler);
