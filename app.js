@@ -315,6 +315,73 @@ const fetchAndUpdateAnnotations = async (_req, res) => {
   }
 };
 
+/**
+ * Fetches all annotated templates from the registry graph.
+ * @returns {Promise<string[]>} An array containing the URIs of the annotated templates.
+ */
+const fetchAllTemplatesAnnotated = async () => {
+  const selectTemplateAnnotatedQuery = `
+  PREFIX mobiliteit: <https://data.vlaanderen.be/ns/mobiliteit#>
+  PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
+
+  SELECT DISTINCT ?uri WHERE {
+    GRAPH <http://mu.semte.ch/graphs/mow/registry> {
+      ?uri a mobiliteit:Template ;
+        ext:annotated ?annotated .
+    }
+  }
+  `;
+
+  const response = await query(selectTemplateAnnotatedQuery);
+
+  return response.results.bindings.map((binding) => binding.uri.value);
+};
+
+/**
+ * Return delete annotated templates query.
+ * @param {string[]} uris - The array containing the uris of the annotated templates.
+ * @returns {string} The query string.
+ */
+const deleteChuckQuery = (uris) => {
+  return uris
+    .map(
+      (uri) =>
+        `DELETE WHERE {
+          GRAPH <http://mu.semte.ch/graphs/mow/registry> {
+            <${uri}> ext:annotated ?template .
+          }
+        };\n`
+    )
+    .join(" ");
+};
+
+/**
+ * Resets all annotated templates in the registry graph.
+ */
+const clearAnnotatedTemplate = async (_req, res) => {
+  try {
+    const response = await fetchAllTemplatesAnnotated();
+    const chunked = splitIntoChunks(response, 10);
+
+    for (let uris of chunked) {
+      const updateQuery = `
+      PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
+
+      ${deleteChuckQuery(uris)}
+      `;
+
+      await update(updateQuery);
+    }
+
+    res.end("Done");
+  } catch (err) {
+    res.send("Oops something went wrong: " + err);
+    console.error(err);
+  }
+};
+
 app.post("/fixAnnotated", fetchAndUpdateAnnotations);
+
+app.post("/clear-annotated", clearAnnotatedTemplate);
 
 app.use(errorHandler);
