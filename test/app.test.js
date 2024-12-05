@@ -38,7 +38,7 @@ const {
 );
 
 // 1. Mock the response from the SPARQL query
-import templateReponse from "./mocks/select-template-response.json" assert { type: "json" };
+import templateReponse from "./mocks/select-template-response.json" with { type: "json" };
 // 2. Paresed bindings from the response
 const parsedBinding = [
   {
