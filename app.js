@@ -138,12 +138,12 @@ export const splitIntoChunks = (dataArray, chunkSize) => {
  */
 const generateTextTemplate = ({ uri, value, defaultValue }) => {
   return `
-    <span resource="${uri}" typeof="mobiliteit:Variabele">
+    <span resource="${uri}" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
       <span class="mark-highlight-manual" property="rdfs:value">\${${value}}</span>
       ${
         !defaultValue?.length
           ? ""
-          : `<span property="mobiliteit:standaardwaarde">${defaultValue}</span>`
+          : `<span property="https://data.vlaanderen.be/ns/mobiliteit#standaardwaarde">${defaultValue}</span>`
       }
     </span>
   `;
@@ -167,7 +167,7 @@ const generateCodelistTemplate = ({
   defaultValue,
 }) => {
   return `
-    <span resource="${uri}" typeof="mobiliteit:Variabele">
+    <span resource="${uri}" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
       <span property="dct:type" content="codelist"></span>
       <span property="dct:source" resource="${source}"></span>
       <span property="ext:codelist" resource="${codelist}"></span>
@@ -175,7 +175,7 @@ const generateCodelistTemplate = ({
       ${
         !defaultValue?.length
           ? ""
-          : `<span property="mobiliteit:standaardwaarde">${defaultValue}</span>`
+          : `<span property="https://data.vlaanderen.be/ns/mobiliteit#standaardwaarde">${defaultValue}</span>`
       }
     </span>
   `;
@@ -193,14 +193,14 @@ const generateCodelistTemplate = ({
  */
 const generateLocationTemplate = ({ uri, value, source, defaultValue }) => {
   return `
-    <span resource="${uri}" typeof="mobiliteit:Variabele">
+    <span resource="${uri}" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
       <span property="dct:type" content="location"></span>
       <span property="dct:source" resource="${source}"></span>
       <span class="mark-highlight-manual" property="rdfs:value">\${${value}}</span>
       ${
         !defaultValue?.length
           ? ""
-          : `<span property="mobiliteit:standaardwaarde">${defaultValue}</span>`
+          : `<span property="https://data.vlaanderen.be/ns/mobiliteit#standaardwaarde">${defaultValue}</span>`
       }
     </span>
   `;
@@ -217,13 +217,13 @@ const generateLocationTemplate = ({ uri, value, source, defaultValue }) => {
  */
 const generateDateTemplate = ({ uri, value, defaultValue }) => {
   return `
-    <span resource="${uri}" typeof="mobiliteit:Variabele">
+    <span resource="${uri}" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
       <span property="dct:type" content="date"></span>
       <span class="mark-highlight-manual" property="rdfs:value" datatype="xsd:date">\${${value}}</span>
       ${
         !defaultValue?.length
           ? ""
-          : `<span property="mobiliteit:standaardwaarde" datatype="xsd:date">${defaultValue}</span>`
+          : `<span property="https://data.vlaanderen.be/ns/mobiliteit#standaardwaarde" datatype="xsd:date">${defaultValue}</span>`
       }
     </span>
   `;
