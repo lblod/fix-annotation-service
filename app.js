@@ -27,7 +27,7 @@ import { SPARQL_ENDPOINT } from "./config.js";
  */
 const fetchTemplateData = async () => {
   const selectTemplateQuery = `
-  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
   PREFIX dct: <http://purl.org/dc/terms/>
   PREFIX prov: <http://www.w3.org/ns/prov#>
   PREFIX mobiliteit: <https://data.vlaanderen.be/ns/mobiliteit#>
@@ -41,7 +41,7 @@ const fetchTemplateData = async () => {
     OPTIONAL {
       ?uri mobiliteit:variabele ?variableUri .
       ?variableUri dct:type ?variableType ;
-        rdfs:value ?variableValue .
+        rdf:value ?variableValue .
 
       OPTIONAL {
         ?variableUri mobiliteit:standaardwaarde ?variableDefaultValue .
@@ -139,7 +139,7 @@ export const splitIntoChunks = (dataArray, chunkSize) => {
 const generateTextTemplate = ({ uri, value, defaultValue }) => {
   return `
     <span resource="${uri}" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
-      <span class="mark-highlight-manual" property="rdfs:value">\${${value}}</span>
+      <span class="mark-highlight-manual" property="rdf:value">\${${value}}</span>
       ${
         !defaultValue?.length
           ? ""
@@ -171,7 +171,7 @@ const generateCodelistTemplate = ({
       <span property="dct:type" content="codelist"></span>
       <span property="dct:source" resource="${source}"></span>
       <span property="ext:codelist" resource="${codelist}"></span>
-      <span class="mark-highlight-manual" property="rdfs:value">\${${value}}</span>
+      <span class="mark-highlight-manual" property="rdf:value">\${${value}}</span>
       ${
         !defaultValue?.length
           ? ""
@@ -196,7 +196,7 @@ const generateLocationTemplate = ({ uri, value, source, defaultValue }) => {
     <span resource="${uri}" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
       <span property="dct:type" content="location"></span>
       <span property="dct:source" resource="${source}"></span>
-      <span class="mark-highlight-manual" property="rdfs:value">\${${value}}</span>
+      <span class="mark-highlight-manual" property="rdf:value">\${${value}}</span>
       ${
         !defaultValue?.length
           ? ""
@@ -219,7 +219,7 @@ const generateDateTemplate = ({ uri, value, defaultValue }) => {
   return `
     <span resource="${uri}" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
       <span property="dct:type" content="date"></span>
-      <span class="mark-highlight-manual" property="rdfs:value" datatype="xsd:date">\${${value}}</span>
+      <span class="mark-highlight-manual" property="rdf:value" datatype="xsd:date">\${${value}}</span>
       ${
         !defaultValue?.length
           ? ""
