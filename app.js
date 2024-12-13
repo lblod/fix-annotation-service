@@ -310,17 +310,16 @@ export const generateUpdateQuery = (annotatedArray) => {
 };
 
 /**
- * Fetches and updates annotations based on a predefined SPARQL query.
+ * Fetches and updates all annotations.
  *
- * This function executes a SPARQL query to fetch template data, processes the data,
- * and updates the annotations in batches. It sends a response indicating the completion
- * or an error message if something goes wrong.
+ * This function executes a SPARQL query to fetch all template data, processes the data,
+ * and updates the annotations in batches. 
  *
  * @param {import('express').Request} _req - The Express request object (not used in this function).
  * @param {import('express').Response} res - The Express response object used to send the response.
  * @returns {Promise<void>} - A promise that resolves when the operation is complete.
  */
-const fetchAndUpdateAnnotations = async (_req, res) => {
+const fetchAndUpdateAllAnnotations = async (_req, res) => {
   try {
     const response = await fetchTemplateData();
     const data = parseSelectTemplateBindings(response.results.bindings);
@@ -339,10 +338,11 @@ const fetchAndUpdateAnnotations = async (_req, res) => {
 
 /**
  * Fetches all annotated templates from the registry graph.
- * @returns {Promise<string[]>} An array containing the URIs of the annotated templates.
+ * 
+ * @returns {Promise<string[]>} An array containing the URIs of templates with annotated.
  */
-const fetchAllTemplatesAnnotated = async () => {
-  const selectTemplateAnnotatedQuery = `
+const fetchAllTemplatesWithAnnotated = async () => {
+  const selectTemplateWithAnnotatedQuery = `
   PREFIX mobiliteit: <https://data.vlaanderen.be/ns/mobiliteit#>
   PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 
@@ -354,7 +354,7 @@ const fetchAllTemplatesAnnotated = async () => {
   }
   `;
 
-  const response = await query(selectTemplateAnnotatedQuery);
+  const response = await query(selectTemplateWithAnnotatedQuery);
 
   return response.results.bindings.map((binding) => binding.uri.value);
 };
@@ -379,13 +379,17 @@ const deleteChuckQuery = (uris) => {
 
 /**
  * Resets all annotated templates in the registry graph.
+ * 
+ * @param {import('express').Request} _req - The Express request object (not used in this function).
+ * @param {import('express').Response} res - The Express response object used to send the response.
+ * @returns {Promise<void>} - A promise that resolves when the operation is complete.
  */
 const clearAnnotatedTemplate = async (_req, res) => {
   try {
-    const response = await fetchAllTemplatesAnnotated();
-    const chunked = splitIntoChunks(response, 10);
+    const templateUris = await fetchAllTemplatesWithAnnotated();
+    const chunkedTemplateUris = splitIntoChunks(templateUris, 10);
 
-    for (let uris of chunked) {
+    for (let uris of chunkedTemplateUris) {
       const updateQuery = `
       PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 
