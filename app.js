@@ -1,4 +1,4 @@
-import { app, errorHandler, sparqlEscapeString } from "mu";
+import { app, errorHandler, sparqlEscapeString, sparqlEscapeUri } from "mu";
 import { querySudo as query, updateSudo as update } from "@lblod/mu-auth-sudo";
 import { SPARQL_ENDPOINT } from "./config.js";
 
@@ -23,9 +23,21 @@ import { SPARQL_ENDPOINT } from "./config.js";
 /**
  * Fetches template data from the SPARQL endpoint.
  *
+ * If no templateUris are provided, all templates will be fetched.
+ * @param {string[]} [templateUris] - The URIs of the templates to be fetched.
  * @returns {Promise<SparqlSelectTemplatesResponse>} The response object containing the bindings.
  */
-const fetchTemplateData = async () => {
+const fetchTemplateData = async (templateUris) => {
+  if (templateUris && !Array.isArray(templateUris)) {
+    throw new Error("templateUris must be an array of strings.");
+  }
+
+  const values = templateUris?.length
+    ? `VALUES ?uri {${templateUris
+        .map((uri) => sparqlEscapeUri(uri))
+        .join(" ")}}`
+    : "";
+
   const selectTemplateQuery = `
   PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
   PREFIX dct: <http://purl.org/dc/terms/>
@@ -34,6 +46,7 @@ const fetchTemplateData = async () => {
   PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 
   SELECT DISTINCT ?uri ?templateValue ?variableUri ?variableType ?variableValue ?variableDefaultValue ?variableCodelist WHERE {
+    ${values}
 
     ?uri a mobiliteit:Template ;
       prov:value ?templateValue .
@@ -313,7 +326,7 @@ export const generateUpdateQuery = (annotatedArray) => {
  * Fetches and updates all annotations.
  *
  * This function executes a SPARQL query to fetch all template data, processes the data,
- * and updates the annotations in batches. 
+ * and updates the annotations in batches.
  *
  * @param {import('express').Request} _req - The Express request object (not used in this function).
  * @param {import('express').Response} res - The Express response object used to send the response.
@@ -322,6 +335,10 @@ export const generateUpdateQuery = (annotatedArray) => {
 const fetchAndUpdateAllAnnotations = async (_req, res) => {
   try {
     const response = await fetchTemplateData();
+    if (!response.results.bindings.length) {
+      return res.send("No templates found");
+    }
+    
     const data = parseSelectTemplateBindings(response.results.bindings);
     const annotatedArray = generateAnnotatedArray(data);
     const chunkedAnnotatedArray = splitIntoChunks(annotatedArray, 10);
@@ -338,7 +355,7 @@ const fetchAndUpdateAllAnnotations = async (_req, res) => {
 
 /**
  * Fetches all annotated templates from the registry graph.
- * 
+ *
  * @returns {Promise<string[]>} An array containing the URIs of templates with annotated.
  */
 const fetchAllTemplatesWithAnnotated = async () => {
@@ -379,7 +396,7 @@ const deleteChuckQuery = (uris) => {
 
 /**
  * Resets all annotated templates in the registry graph.
- * 
+ *
  * @param {import('express').Request} _req - The Express request object (not used in this function).
  * @param {import('express').Response} res - The Express response object used to send the response.
  * @returns {Promise<void>} - A promise that resolves when the operation is complete.
