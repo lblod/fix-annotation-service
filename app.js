@@ -1,6 +1,7 @@
 import { app, errorHandler, sparqlEscapeString, sparqlEscapeUri } from "mu";
 import { querySudo as query, updateSudo as update } from "@lblod/mu-auth-sudo";
 import { SPARQL_ENDPOINT } from "./config.js";
+import bodyParser from "body-parser";
 
 /**
  * @typedef {Object} SparqlSelectTemplatesBinding
@@ -322,6 +323,16 @@ export const generateUpdateQuery = (annotatedArray) => {
   `;
 };
 
+const processTemplateAnnotations = async (bindings) => {
+  const data = parseSelectTemplateBindings(bindings);
+  const annotatedArray = generateAnnotatedArray(data);
+  const chunkedAnnotatedArray = splitIntoChunks(annotatedArray, 10);
+  for (let chunkedTemplates of chunkedAnnotatedArray) {
+    const updateQuery = generateUpdateQuery(chunkedTemplates);
+    await update(updateQuery);
+  }
+};
+
 /**
  * Fetches and updates all annotations.
  *
@@ -338,14 +349,8 @@ const fetchAndUpdateAllAnnotations = async (_req, res) => {
     if (!response.results.bindings.length) {
       return res.send("No templates found");
     }
-    
-    const data = parseSelectTemplateBindings(response.results.bindings);
-    const annotatedArray = generateAnnotatedArray(data);
-    const chunkedAnnotatedArray = splitIntoChunks(annotatedArray, 10);
-    for (let chunkedTemplates of chunkedAnnotatedArray) {
-      const updateQuery = generateUpdateQuery(chunkedTemplates);
-      await update(updateQuery);
-    }
+
+    await processTemplateAnnotations(response.results.bindings);
     res.end("Done");
   } catch (err) {
     res.send("Oops something went wrong: " + err);
@@ -423,7 +428,49 @@ const clearAnnotatedTemplate = async (_req, res) => {
   }
 };
 
-app.post("/fixAnnotated", fetchAndUpdateAnnotations);
+/**
+ * Extracts URIs (subject value) from the delta inserts.
+ *
+ * @param {Object[]} deltas - The array of deltas.
+ * @returns {string[]} The array containing the URIs of the inserts.
+ */
+export const extractInsertUris = (deltas) => {
+  const uris = deltas
+    .map(({ inserts }) => inserts.map(({ subject }) => subject.value))
+    .flat();
+
+  return [...new Set(uris)];
+};
+
+const updateAnnotationsFromDelta = async (req, res) => {
+  console.log("Received delta request");
+  console.log(req.get("content-type"));
+  console.log(JSON.stringify(req.body));
+
+  // check if the body contains delta
+  if (!req.body || !req.body.length) {
+    console.log("No delta found");
+    return res.status(202).send();
+  }
+
+  const updatedUris = extractInsertUris(req.body);
+  const templates = await fetchTemplateData(updatedUris);
+  if (!templates.results.bindings.length) {
+    return res.send("No templates found");
+  }
+
+  await processTemplateAnnotations(templates.results.bindings);
+
+  return res.status(202).send();
+};
+
+app.post(
+  "/delta",
+  bodyParser.json({ limit: "500mb" }),
+  updateAnnotationsFromDelta
+);
+
+app.post("/fixAnnotated", fetchAndUpdateAllAnnotations);
 
 app.post("/clear-annotated", clearAnnotatedTemplate);
 

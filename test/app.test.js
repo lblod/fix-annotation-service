@@ -10,6 +10,7 @@ const muMock = {
   },
   errorHandler: () => {},
   sparqlEscapeString: (str) => `"""${str}"""`,
+  sparqlEscapeUri: (uri) => `<${uri}>`,
 };
 
 // Import the module with the mocked 'mu' dependency
@@ -19,6 +20,7 @@ const {
   generateAnnotatedArray,
   splitIntoChunks,
   generateUpdateQuery,
+  extractInsertUris,
 } = await esmock.strict(
   "../app.js",
   {
@@ -36,6 +38,8 @@ const {
     isModuleNotFoundError: false,
   }
 );
+
+import { deleteOne, multipleInsertWithDuplicateSubject, updateOne } from "./mocks/delta.js";
 
 // 1. Mock the response from the SPARQL query
 import templateReponse from "./mocks/select-template-response.json" with { type: "json" };
@@ -285,3 +289,20 @@ describe("generateUpdateQuery", () => {
     assert.strictEqual(normalize(result), normalize(expected));
   });
 });
+
+describe("extractInsertUris", () => {
+  it("should extract insert uris", () => {
+    const result = extractInsertUris(updateOne);
+    assert.deepStrictEqual(result, ["http://data.lblod.info/templates/61B33386BF5C7500090006E7"]);
+  });
+
+  it("should return empty array if no inserts are provided", () => {
+     const result = extractInsertUris(deleteOne);
+    assert.deepStrictEqual(result, []);
+  });
+
+  it("should deduplicate uris", () => {
+    const result = extractInsertUris(multipleInsertWithDuplicateSubject);
+    assert.deepStrictEqual(result, ["http://mu.semte.ch/", "http://data.lblod.info/templates/61B33386BF5C7500090006E7"]);
+  });
+})
