@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "test": "mocha --exit"
+    "test": "mocha 'test/**/*.js' --exit"
   },
   "author": "redpencil.io",
   "license": "MIT",
