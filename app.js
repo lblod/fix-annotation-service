@@ -27,7 +27,7 @@ const processTemplateAnnotations = async (bindings) => {
   }
 };
 
-// updates annotations based on the delta
+// updates annotated templates based on insertions in the delta
 app.post("/delta", bodyParser.json({ limit: "500mb" }), async (req, res) => {
   if (!req.body || !req.body.length) {
     console.log("No delta found");
@@ -45,8 +45,8 @@ app.post("/delta", bodyParser.json({ limit: "500mb" }), async (req, res) => {
   return res.status(202).send();
 });
 
-// Fetches and updates all annotations
-app.post("/fixAnnotated", async (_req, res) => {
+// Fetches and updates all annotated templates
+app.post("/update-all", async (_req, res) => {
   try {
     const response = await getTemplatesAndVariables();
     if (!response.results.bindings.length) {
@@ -62,7 +62,7 @@ app.post("/fixAnnotated", async (_req, res) => {
 });
 
 // Clear all annotated templates
-app.post("/clear-annotated", async (_req, res) => {
+app.post("/clear", async (_req, res) => {
   try {
     const templateUris = await getAllAnnotatedTemplateUris();
     const chunkedTemplateUris = chunkArray(templateUris, 10);
