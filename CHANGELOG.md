@@ -1,5 +1,29 @@
 
 
+
+## v2.0.0 (2024-12-18)
+
+#### :boom: Breaking Change
+* [#13](https://github.com/lblod/fix-annotation-service/pull/13) Add delta endpoint ([@aliokan](https://github.com/aliokan))
+* [#12](https://github.com/lblod/fix-annotation-service/pull/12) fix: Update RDF prefix from rdfs to rdf in template ([@aliokan](https://github.com/aliokan))
+* [#8](https://github.com/lblod/fix-annotation-service/pull/8) Update annotated model ([@aliokan](https://github.com/aliokan))
+
+#### :rocket: Enhancement
+* [#13](https://github.com/lblod/fix-annotation-service/pull/13) Add delta endpoint ([@aliokan](https://github.com/aliokan))
+* [#10](https://github.com/lblod/fix-annotation-service/pull/10) Add clear annotated endpoint ([@aliokan](https://github.com/aliokan))
+* [#8](https://github.com/lblod/fix-annotation-service/pull/8) Update annotated model ([@aliokan](https://github.com/aliokan))
+
+#### :bug: Bug Fix
+* [#12](https://github.com/lblod/fix-annotation-service/pull/12) fix: Update RDF prefix from rdfs to rdf in template ([@aliokan](https://github.com/aliokan))
+* [#11](https://github.com/lblod/fix-annotation-service/pull/11) Use mobiliteit full path in annotated template ([@aliokan](https://github.com/aliokan))
+
+#### :house: Internal
+* [#14](https://github.com/lblod/fix-annotation-service/pull/14) Update release configuration and package description ([@aliokan](https://github.com/aliokan))
+* [#9](https://github.com/lblod/fix-annotation-service/pull/9) Migrate CI configuration from Drone to Woodpecker ([@aliokan](https://github.com/aliokan))
+
+#### Committers: 1
+- Laurent Deketelaere ([@aliokan](https://github.com/aliokan))
+
 ## 1.0.0 (2023-06-02)
 
 #### :boom: Breaking Change
