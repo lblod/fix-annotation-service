@@ -15,7 +15,7 @@ import { chunkArray, extractInsertUris } from "./lib/utils.js";
 /**
  * Processes the template annotations.
  *
- * @param {SparqlSelectTemplatesBinding[]} bindings - The bindings to be processed.
+ * @param {SparqlSelectTemplatesBinding[]} bindings - The bindings from the SPARQL response.
  * @returns {Promise<void>} A promise that resolves when the operation is complete.
  */
 const processTemplateAnnotations = async (bindings) => {
@@ -31,16 +31,18 @@ const processTemplateAnnotations = async (bindings) => {
 app.post("/delta", bodyParser.json({ limit: "500mb" }), async (req, res) => {
   if (!req.body || !req.body.length) {
     console.log("No delta found");
-    return res.status(202).send();
+    return res.status(400).send();
   }
 
   const updatedUris = extractInsertUris(req.body);
   const templates = await getTemplatesAndVariables(updatedUris);
   if (!templates.results.bindings.length) {
-    return res.send("No templates found");
+    console.log("No templates found");
+    return res.status(404).send();
   }
 
-  await processTemplateAnnotations(templates.results.bindings);
+  // Process templates in the background, returning 202 status immediately to release the connection with the delta-notifier
+  processTemplateAnnotations(templates.results.bindings);
 
   return res.status(202).send();
 });
@@ -50,13 +52,13 @@ app.post("/update-all", async (_req, res) => {
   try {
     const response = await getTemplatesAndVariables();
     if (!response.results.bindings.length) {
-      return res.send("No templates found");
+      return res.status(404).send("No templates found");
     }
 
     await processTemplateAnnotations(response.results.bindings);
     res.end("Done");
   } catch (err) {
-    res.send("Oops something went wrong: " + err);
+    res.status(500).send("Oops something went wrong: " + err);
     console.log(err);
   }
 });
@@ -73,7 +75,7 @@ app.post("/clear", async (_req, res) => {
 
     res.end("Done");
   } catch (err) {
-    res.send("Oops something went wrong: " + err);
+    res.status(500).send("Oops something went wrong: " + err);
     console.error(err);
   }
 });
