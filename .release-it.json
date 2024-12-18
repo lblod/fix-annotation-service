@@ -1,20 +1,19 @@
 {
-    "git": {
-	"requireBranch": [
-	    "master",
-	    "development"
-	]
-    },
-    "github": {
-	    "release": true
-    },
-    "plugins": {
-	    "release-it-lerna-changelog": {
-	      "infile": "CHANGELOG.md",
-	      "launchEditor": true
-	    }
-    },
-    "npm": {
-	    "publish": false
-    }
+	"git": {
+		"commitMessage": "chore: Release ${version}",
+		"tagName": "v${version}"
+	},
+	"github": {
+		"release": true,
+		"tokenRef": "GITHUB_AUTH"
+	},
+	"plugins": {
+		"@release-it-plugins/lerna-changelog": {
+			"infile": "CHANGELOG.md",
+			"launchEditor": true
+		}
+	},
+	"npm": {
+		"publish": false
+	}
 }
