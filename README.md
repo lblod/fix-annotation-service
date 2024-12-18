@@ -1,23 +1,45 @@
 # fix-annotation-service
 
-This plugin generates annotated versions of all the templates that don't have it. In order to do that you just have to send a 
-POST request to `/fixAnnotated` and the server will answer with `Done` once it has finished.
+This plugin generates annotated versions of the templates. 
 
+## Endpoints
 
-## development and testing
-This service extends semtech/mu-javascript-template. For development include the following in your docker-compose.yml:
+### POST /delta
 
+This endpoint delta from `delta-notifier` service. 
+It will update the `ex:annotated` property on `mobiliteit:Template` based on inserted triples.
+
+Example `delta-notifier` configuration:
 ```
-  fixAnnotated:
-    image: semtech/mu-javascript-template
-    ports:
-      - 9229:9229
-    environment:
-      NODE_ENV: "development"
-      LOG_SPARQL_ALL: "true"
-      DEBUG_AUTH_HEADERS: "true"
-    volumes:
-        - /path/to/fix-annotation-service:/app/
+{
+  match: {
+    predicate: {
+      type: 'uri',
+      value: 'http://www.w3.org/ns/prov#value'
+    }
+  },
+  callback: {
+    url: "http://annotater/delta",
+    method: "POST",
+  },
+  options: {
+    resourceFormat: "v0.0.1",
+    ignoreFromSelf: true,
+    gracePeriod: 250,
+  },
+}
 ```
 
-You can also expose the 80 port to call the endpoint using postman
+### POST /update-all
+
+Update all `ex:annotated` on `mobiliteit:Template`. 
+```
+docker compose exec annotater curl -X POST http://localhost/update-all
+```
+
+### POST /clear
+
+Delete all `ex:annotated` on `mobiliteit:Template`.
+```
+docker compose exec annotater curl -X POST http://localhost/clear
+```

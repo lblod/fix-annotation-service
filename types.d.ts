@@ -20,4 +20,5 @@ declare module "mu" {
   export const app: Express;
   export const errorHandler: ErrorRequestHandler;
   export const sparqlEscapeString: (value: string) => string;
+  export const sparqlEscapeUri: (value: string) => string;
 }
