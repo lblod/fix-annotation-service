@@ -1,12 +1,13 @@
 {
   "name": "fix-annotation-service",
   "version": "1.0.0",
-  "description": "This plugin generates annotated versions of all the templates that don't have it. In order to do that you just have to send a  POST request to `/fixAnnotated` and the server will answer with `Done` once it has finished.",
+  "description": "Service to update annotated templates via RESTful API",
   "main": "app.js",
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "test": "mocha 'test/**/*.js' --exit"
+    "test": "mocha 'test/**/*.js' --exit",
+    "release": "release-it"
   },
   "author": "redpencil.io",
   "license": "MIT",
@@ -16,10 +17,12 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
+    "@release-it-plugins/lerna-changelog": "^7.0.0",
     "@types/express": "^4.17.21",
     "eslint": "^9.15.0",
     "esmock": "^2.6.9",
     "mocha": "^10.8.2",
+    "release-it": "^17.10.0",
     "sinon": "^19.0.2"
   },
   "repository": {
