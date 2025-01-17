@@ -5,6 +5,7 @@ import {
   getAllAnnotatedTemplateUris,
   getTemplatesAndVariables,
   updateAnnotated,
+  getLinkedTemplates,
 } from "./lib/queries.js";
 import {
   generateAnnotatedTemplates,
@@ -27,6 +28,16 @@ const processTemplateAnnotations = async (bindings) => {
   }
 };
 
+const updateLinkedTemplates = async (uris) => {
+  const urisToUpdate = await getLinkedTemplates(uris);
+  if (!urisToUpdate.length) {
+    //No templates linked to the updated ones
+    return;
+  }
+  const templates = await getTemplatesAndVariables(urisToUpdate);
+  processTemplateAnnotations(templates.results.bindings);
+};
+
 // updates annotated templates based on insertions in the delta
 app.post("/delta", bodyParser.json({ limit: "500mb" }), async (req, res) => {
   if (!req.body || !req.body.length) {
@@ -42,7 +53,9 @@ app.post("/delta", bodyParser.json({ limit: "500mb" }), async (req, res) => {
   }
 
   // Process templates in the background, returning 202 status immediately to release the connection with the delta-notifier
-  processTemplateAnnotations(templates.results.bindings);
+  processTemplateAnnotations(templates.results.bindings).then(() => {
+    updateLinkedTemplates(updatedUris);
+  });
 
   return res.status(202).send();
 });
