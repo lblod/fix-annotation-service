@@ -28,6 +28,12 @@ const processTemplateAnnotations = async (bindings) => {
   }
 };
 
+/**
+ * Updates the templates linked with the uris provided
+ *
+ * @param {{string[]}} uris -  An array of unique URIs.
+ * @returns {Promise<void>} A promise that resolves when the operation is complete.
+ */
 const updateLinkedTemplates = async (uris) => {
   const urisToUpdate = await getLinkedTemplates(uris);
   if (!urisToUpdate.length) {
@@ -35,7 +41,7 @@ const updateLinkedTemplates = async (uris) => {
     return;
   }
   const templates = await getTemplatesAndVariables(urisToUpdate);
-  processTemplateAnnotations(templates.results.bindings);
+  return processTemplateAnnotations(templates.results.bindings);
 };
 
 // updates annotated templates based on insertions in the delta
@@ -54,6 +60,7 @@ app.post("/delta", bodyParser.json({ limit: "500mb" }), async (req, res) => {
 
   // Process templates in the background, returning 202 status immediately to release the connection with the delta-notifier
   processTemplateAnnotations(templates.results.bindings).then(() => {
+    //When we update a instruction we have to update all the linked templates to ensure consistency
     updateLinkedTemplates(updatedUris);
   });
 
@@ -69,6 +76,9 @@ app.post("/update-all", async (_req, res) => {
     }
 
     await processTemplateAnnotations(response.results.bindings);
+    //We run it twice to ensure that the templates dependant on templates get updated correctly
+    const secondRound = await getTemplatesAndVariables();
+    await processTemplateAnnotations(secondRound.results.bindings);
     res.end("Done");
   } catch (err) {
     res.status(500).send("Oops something went wrong: " + err);
