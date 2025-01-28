@@ -67,7 +67,36 @@ const annotatedArray = [
   {
     uri: "http://data.lblod.info/templates/67476E5D5A9960633226D2AB",
     annotated:
-      '\n    <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AC" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">\n      <span property="dct:type" content="location"></span>\n      <span property="dct:source" resource="http://example.com/sparql"></span>\n      <span class="mark-highlight-manual" property="rdf:value">${locatie}</span>\n      \n    </span>\n   abc, \n    <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AD" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">\n      <span class="mark-highlight-manual" property="rdf:value">${autonummer}</span>\n      \n    </span>\n   dan \n    <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AE" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">\n      <span class="mark-highlight-manual" property="rdf:value">${tekst}</span>\n      \n    </span>\n   codelijst van \n    <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AF" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">\n      <span property="dct:type" content="codelist"></span>\n      <span property="dct:source" resource="http://example.com/sparql"></span>\n      <span property="ext:codelist" resource="http://lblod.data.gift/concept-schemes/63B58F51867176EC5DDD14C9"></span>\n      <span class="mark-highlight-manual" property="rdf:value">${codelijst}</span>\n      \n    </span>\n   en ook nog is een datum eh \n    <span resource="http://data.lblod.info/variables/67476E5E5A9960633226D2B0" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">\n      <span property="dct:type" content="date"></span>\n      <span class="mark-highlight-manual" property="rdf:value" datatype="xsd:date">${datum}</span>\n      \n    </span>\n   \n    <span resource="http://data.lblod.info/variables/67476E5E5A9960633226D2B1" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">\n      <span class="mark-highlight-manual" property="rdf:value">${cijferstesten}</span>\n      \n    </span>\n  ',
+      `
+      <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AC" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
+        <span property="dct:type" content="location"></span>
+        <span property="dct:source" resource="http://example.com/sparql"></span>
+        <span class="mark-highlight-manual" property="rdf:value">\${locatie}</span>
+      </span>
+      abc,
+      <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AD" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
+        <span class="mark-highlight-manual" property="rdf:value">\${autonummer}</span>
+      </span>
+      dan
+      <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AE" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
+        <span class="mark-highlight-manual" property="rdf:value">\${tekst}</span>
+      </span>
+      codelijst van
+      <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AF" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
+        <span property="dct:type" content="codelist"></span>
+        <span property="dct:source" resource="http://example.com/sparql"></span>
+        <span property="ext:codelist" resource="http://lblod.data.gift/concept-schemes/63B58F51867176EC5DDD14C9"></span>
+        <span class="mark-highlight-manual" property="rdf:value">\${codelijst}</span>
+      </span>
+      en ook nog is een datum eh
+      <span resource="http://data.lblod.info/variables/67476E5E5A9960633226D2B0" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
+        <span property="dct:type" content="date"></span>
+        <span class="mark-highlight-manual" property="rdf:value" datatype="xsd:date">\${datum}</span>
+      </span>
+      <span resource="http://data.lblod.info/variables/67476E5E5A9960633226D2B1" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
+        <span class="mark-highlight-manual" property="rdf:value">\${cijferstesten}</span>
+      </span>
+      `,
   },
   {
     uri: "http://data.lblod.info/templates/643003B35BDCDA240120BDCB",
@@ -188,8 +217,8 @@ describe("process template annotation", () => {
   describe("generateAnnotatedArray", () => {
     it("should generate annotated array", () => {
       const data = parsedBinding;
-      const expected = annotatedArray;
-      const result = generateAnnotatedTemplates(data);
+      const expected = annotatedArray.map((entry) => { return {...entry, annotated: normalize(entry.annotated)} });
+      const result = generateAnnotatedTemplates(data).map((entry) => { return {...entry, annotated: normalize(entry.annotated)} });
       assert.deepStrictEqual(result, expected);
     });
   });
