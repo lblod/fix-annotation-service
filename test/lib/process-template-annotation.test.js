@@ -24,34 +24,34 @@ const parsedBinding = [
       {
         uri: "http://data.lblod.info/variables/67476E5D5A9960633226D2AF",
         type: "codelist",
-        value: "codelijst",
+        label: "codelijst",
         codelist:
           "http://lblod.data.gift/concept-schemes/63B58F51867176EC5DDD14C9",
       },
       {
         uri: "http://data.lblod.info/variables/67476E5E5A9960633226D2B0",
         type: "date",
-        value: "datum",
+        label: "datum",
       },
       {
         uri: "http://data.lblod.info/variables/67476E5D5A9960633226D2AC",
         type: "location",
-        value: "locatie",
+        label: "locatie",
       },
       {
         uri: "http://data.lblod.info/variables/67476E5D5A9960633226D2AD",
         type: "number",
-        value: "autonummer",
+        label: "autonummer",
       },
       {
         uri: "http://data.lblod.info/variables/67476E5D5A9960633226D2AE",
         type: "text",
-        value: "tekst",
+        label: "tekst",
       },
       {
         uri: "http://data.lblod.info/variables/67476E5E5A9960633226D2B1",
         type: "number",
-        value: "cijferstesten",
+        label: "cijferstesten",
       },
     ],
   },
@@ -71,30 +71,30 @@ const annotatedArray = [
       <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AC" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
         <span property="dct:type" content="location"></span>
         <span property="dct:source" resource="http://example.com/sparql"></span>
-        <span class="mark-highlight-manual" property="rdf:value">\${locatie}</span>
+        <span class="mark-highlight-manual" property="dct:title">\${locatie}</span>
       </span>
       abc,
       <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AD" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
-        <span class="mark-highlight-manual" property="rdf:value">\${autonummer}</span>
+        <span class="mark-highlight-manual" property="dct:title">\${autonummer}</span>
       </span>
       dan
       <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AE" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
-        <span class="mark-highlight-manual" property="rdf:value">\${tekst}</span>
+        <span class="mark-highlight-manual" property="dct:title">\${tekst}</span>
       </span>
       codelijst van
       <span resource="http://data.lblod.info/variables/67476E5D5A9960633226D2AF" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
         <span property="dct:type" content="codelist"></span>
         <span property="dct:source" resource="http://example.com/sparql"></span>
         <span property="ext:codelist" resource="http://lblod.data.gift/concept-schemes/63B58F51867176EC5DDD14C9"></span>
-        <span class="mark-highlight-manual" property="rdf:value">\${codelijst}</span>
+        <span class="mark-highlight-manual" property="dct:title">\${codelijst}</span>
       </span>
       en ook nog is een datum eh
       <span resource="http://data.lblod.info/variables/67476E5E5A9960633226D2B0" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
         <span property="dct:type" content="date"></span>
-        <span class="mark-highlight-manual" property="rdf:value" datatype="xsd:date">\${datum}</span>
+        <span class="mark-highlight-manual" property="dct:title">\${datum}</span>
       </span>
       <span resource="http://data.lblod.info/variables/67476E5E5A9960633226D2B1" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
-        <span class="mark-highlight-manual" property="rdf:value">\${cijferstesten}</span>
+        <span class="mark-highlight-manual" property="dct:title">\${cijferstesten}</span>
       </span>
       `,
   },
@@ -132,25 +132,25 @@ describe("process template annotation", () => {
         variables: [
           {
             uri: "http://data.lblod.info/mappings/6486F5D44E5B47D5A3A1EDE3",
-            value: "locatie",
+            label: "locatie",
             type: "location",
             defaultValue: "Locatie_1",
           },
           {
             uri: "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE4",
-            value: "autonummer",
+            label: "autonummer",
             type: "number",
             defaultValue: "123",
           },
           {
             uri: "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE5",
-            value: "tekst",
+            label: "tekst",
             type: "text",
             defaultValue: "Tekst_1",
           },
           {
             uri: "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE6",
-            value: "codelijst",
+            label: "codelijst",
             type: "codelist",
             codelist:
               "http://lblod.data.gift/concept-schemes/61C054CEE3249100080000B9",
@@ -158,13 +158,13 @@ describe("process template annotation", () => {
           },
           {
             uri: "http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE7",
-            value: "datum",
+            label: "datum",
             type: "date",
             defaultValue: "2021-01-01",
           },
           {
             uri: "http://data.lblod.info/mappings/649D79A34E5B47D5A3A1EE0F",
-            value: "cijferstesten",
+            label: "cijferstesten",
             type: "number",
             defaultValue: "456",
           },
@@ -174,17 +174,17 @@ describe("process template annotation", () => {
         <span resource="http://data.lblod.info/mappings/6486F5D44E5B47D5A3A1EDE3" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
           <span property="dct:type" content="location"></span>  
           <span property="dct:source" resource="http://example.com/sparql"></span>
-          <span class="mark-highlight-manual" property="rdf:value">\${locatie}</span>
+          <span class="mark-highlight-manual" property="dct:title">\${locatie}</span>
           <span property="https://data.vlaanderen.be/ns/mobiliteit#standaardwaarde">Locatie_1</span>
         </span>
         abc, 
         <span resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE4" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
-          <span class="mark-highlight-manual" property="rdf:value">\${autonummer}</span>
+          <span class="mark-highlight-manual" property="dct:title">\${autonummer}</span>
           <span property="https://data.vlaanderen.be/ns/mobiliteit#standaardwaarde">123</span>
         </span>
         dan 
         <span resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE5" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
-          <span class="mark-highlight-manual" property="rdf:value">\${tekst}</span>
+          <span class="mark-highlight-manual" property="dct:title">\${tekst}</span>
           <span property="https://data.vlaanderen.be/ns/mobiliteit#standaardwaarde">Tekst_1</span>
         </span>
         codelijst van 
@@ -192,18 +192,18 @@ describe("process template annotation", () => {
           <span property="dct:type" content="codelist"></span>   
           <span property="dct:source" resource="http://example.com/sparql"></span>
           <span property="ext:codelist" resource="http://lblod.data.gift/concept-schemes/61C054CEE3249100080000B9"></span>
-          <span class="mark-highlight-manual" property="rdf:value">\${codelijst}</span>
+          <span class="mark-highlight-manual" property="dct:title">\${codelijst}</span>
           <span property="https://data.vlaanderen.be/ns/mobiliteit#standaardwaarde">Codelijst_1</span>
         </span>
         en ook nog is een datum eh 
         <span resource="http://data.lblod.info/mappings/6486F5D54E5B47D5A3A1EDE7" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
           <span property="dct:type" content="date"></span>  
-          <span class="mark-highlight-manual" property="rdf:value" datatype="xsd:date">\${datum}</span>
+          <span class="mark-highlight-manual" property="dct:title">\${datum}</span>
           <span property="https://data.vlaanderen.be/ns/mobiliteit#standaardwaarde" datatype="xsd:date">2021-01-01</span>
         </span>
         
         <span resource="http://data.lblod.info/mappings/649D79A34E5B47D5A3A1EE0F" typeof="https://data.vlaanderen.be/ns/mobiliteit#Variabele">
-          <span class="mark-highlight-manual" property="rdf:value">\${cijferstesten}</span>
+          <span class="mark-highlight-manual" property="dct:title">\${cijferstesten}</span>
           <span property="https://data.vlaanderen.be/ns/mobiliteit#standaardwaarde">456</span>
         </span>`;
       const result = applyTemplateMappings(
