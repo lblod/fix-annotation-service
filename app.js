@@ -1,30 +1,30 @@
 import { app, errorHandler } from "mu";
 import bodyParser from "body-parser";
 import {
-  deleteAnnotated,
-  getAllAnnotatedTemplateUris,
   getTemplatesAndVariables,
-  updateAnnotated,
   getLinkedTemplates,
+  deleteTemplatePreviews,
+  getTemplatesWithPreviews,
+  updateTemplatePreviews,
 } from "./lib/queries.js";
 import {
-  generateAnnotatedTemplates,
+  generateTemplatePreviews,
   parseSelectTemplateBindings,
-} from "./lib/process-template-annotation.js";
+} from "./lib/process-template-preview.js";
 import { chunkArray, extractInsertUris } from "./lib/utils.js";
 
 /**
- * Processes the template annotations.
+ * Processes the template previews.
  *
  * @param {SparqlSelectTemplatesBinding[]} bindings - The bindings from the SPARQL response.
  * @returns {Promise<void>} A promise that resolves when the operation is complete.
  */
-const processTemplateAnnotations = async (bindings) => {
+const processTemplatePreviews = async (bindings) => {
   const templates = parseSelectTemplateBindings(bindings);
-  const annotatedTemplates = generateAnnotatedTemplates(templates);
-  const chunks = chunkArray(annotatedTemplates, 10);
+  const templatePreviews = generateTemplatePreviews(templates);
+  const chunks = chunkArray(templatePreviews, 10);
   for (let chunk of chunks) {
-    await updateAnnotated(chunk);
+    await updateTemplatePreviews(chunk);
   }
 };
 
@@ -41,10 +41,10 @@ const updateLinkedTemplates = async (uris) => {
     return;
   }
   const templates = await getTemplatesAndVariables(urisToUpdate);
-  return processTemplateAnnotations(templates.results.bindings);
+  return processTemplatePreviews(templates.results.bindings);
 };
 
-// updates annotated templates based on insertions in the delta
+// updates  template previews based on insertions in the delta
 app.post("/delta", bodyParser.json({ limit: "500mb" }), async (req, res) => {
   if (!req.body || !req.body.length) {
     console.log("No delta found");
@@ -59,7 +59,7 @@ app.post("/delta", bodyParser.json({ limit: "500mb" }), async (req, res) => {
   }
 
   // Process templates in the background, returning 202 status immediately to release the connection with the delta-notifier
-  processTemplateAnnotations(templates.results.bindings).then(() => {
+  processTemplatePreviews(templates.results.bindings).then(() => {
     //When we update a instruction we have to update all the linked templates to ensure consistency
     updateLinkedTemplates(updatedUris);
   });
@@ -67,7 +67,7 @@ app.post("/delta", bodyParser.json({ limit: "500mb" }), async (req, res) => {
   return res.status(202).send();
 });
 
-// Fetches and updates all annotated templates
+// Fetches and updates all template previews
 app.post("/update-all", async (_req, res) => {
   try {
     const response = await getTemplatesAndVariables();
@@ -75,10 +75,10 @@ app.post("/update-all", async (_req, res) => {
       return res.status(404).send("No templates found");
     }
 
-    await processTemplateAnnotations(response.results.bindings);
+    await processTemplatePreviews(response.results.bindings);
     //We run it twice to ensure that the templates dependant on templates get updated correctly
     const secondRound = await getTemplatesAndVariables();
-    await processTemplateAnnotations(secondRound.results.bindings);
+    await processTemplatePreviews(secondRound.results.bindings);
     res.end("Done");
   } catch (err) {
     res.status(500).send("Oops something went wrong: " + err);
@@ -86,14 +86,14 @@ app.post("/update-all", async (_req, res) => {
   }
 });
 
-// Clear all annotated templates
+// Clear all template previews
 app.post("/clear", async (_req, res) => {
   try {
-    const templateUris = await getAllAnnotatedTemplateUris();
+    const templateUris = await getTemplatesWithPreviews();
     const chunkedTemplateUris = chunkArray(templateUris, 10);
 
     for (let uris of chunkedTemplateUris) {
-      await deleteAnnotated(uris);
+      await deleteTemplatePreviews(uris);
     }
 
     res.end("Done");

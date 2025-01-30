@@ -1,7 +1,7 @@
 {
   "name": "fix-annotation-service",
   "version": "3.0.0",
-  "description": "Service to update annotated templates via RESTful API",
+  "description": "Service to generate MOW template previews via RESTful API",
   "main": "app.js",
   "type": "module",
   "scripts": {
