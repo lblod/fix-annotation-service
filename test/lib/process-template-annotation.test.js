@@ -12,7 +12,7 @@ const {
 });
 
 // 1. Mock the response from the SPARQL query
-import templateReponse from "../mocks/select-template-response.json" with { type: "json" };
+import templateResponse from "../mocks/select-template-response.js";
 
 // 2. Paresed bindings from the response
 const parsedBinding = [
@@ -81,7 +81,7 @@ const normalize = (str) => str.replace(/\s+/g, " ").trim();
 describe("process template annotation", () => {
   describe("parseSelectTemplateBindings", () => {
     it("should parse bindings correctly", () => {
-      const response = templateReponse;
+      const response = templateResponse;
       const expected = parsedBinding;
       const result = parseSelectTemplateBindings(response.results.bindings);
       assert.deepStrictEqual(result, expected);
