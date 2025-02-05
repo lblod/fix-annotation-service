@@ -7,7 +7,7 @@ export const updateOne = [
           value: "http://data.lblod.info/templates/61B33386BF5C7500090006E7",
           type: "uri",
         },
-        predicate: { value: "http://www.w3.org/ns/prov#value", type: "uri" },
+        predicate: { value: "http://www.w3.org/1999/02/22-rdf-syntax-ns#value", type: "uri" },
         object: {
           value:
             "${locatie} \n${B1}; \n${M10};\n${GVIII};\n${WM76.2}.\n${locatie2} \n${B9}.\n${locatie3} \n${B11}.",
@@ -24,7 +24,7 @@ export const updateOne = [
           value: "http://data.lblod.info/templates/61B33386BF5C7500090006E7",
           type: "uri",
         },
-        predicate: { value: "http://www.w3.org/ns/prov#value", type: "uri" },
+        predicate: { value: "http://www.w3.org/1999/02/22-rdf-syntax-ns#value", type: "uri" },
         object: {
           value:
             "${locatie} \\n${B1}; \\n${M10};\\n${GVIII};\\n${WM76.2}.\\n${locatie2} \\n${B9}.\\n${locatie3} \\n${B11}.",
@@ -46,7 +46,7 @@ export const deleteOne = [
           value: "http://data.lblod.info/templates/61B33386BF5C7500090006E7",
           type: "uri",
         },
-        predicate: { value: "http://www.w3.org/ns/prov#value", type: "uri" },
+        predicate: { value: "http://www.w3.org/1999/02/22-rdf-syntax-ns#value", type: "uri" },
         object: {
           value:
             "${locatie} \n${B1}; \n${M10};\n${GVIII};\n${WM76.2}.\n${locatie2} \n${B9}.\n${locatie3} \n${B11}.",
@@ -74,7 +74,7 @@ export const multipleInsertWithDuplicateSubject = [
           value: "http://data.lblod.info/templates/61B33386BF5C7500090006E7",
           type: "uri",
         },
-        predicate: { value: "http://www.w3.org/ns/prov#value", type: "uri" },
+        predicate: { value: "http://www.w3.org/1999/02/22-rdf-syntax-ns#value", type: "uri" },
         object: {
           value:
             "${locatie} \n${B1}; \n${M10};\n${GVIII};\n${WM76.2}.\n${locatie2} \n${B9}.\n${locatie3} \n${B11}.",
@@ -87,7 +87,7 @@ export const multipleInsertWithDuplicateSubject = [
           value: "http://data.lblod.info/templates/61B33386BF5C7500090006E7",
           type: "uri",
         },
-        predicate: { value: "http://www.w3.org/ns/prov#value", type: "uri" },
+        predicate: { value: "http://www.w3.org/1999/02/22-rdf-syntax-ns#value", type: "uri" },
         object: {
           value:
             "${locatie} \n${B1}; \n${M10};\n${GVIII};\n${WM76.2}.\n${locatie2} \n${B9}.\n${locatie3} \n${B11}.",
