@@ -22,8 +22,7 @@
     "eslint": "^9.15.0",
     "esmock": "^2.6.9",
     "mocha": "^10.8.2",
-    "release-it": "^17.10.0",
-    "sinon": "^19.0.2"
+    "release-it": "^17.10.0"
   },
   "repository": {
     "type": "git",

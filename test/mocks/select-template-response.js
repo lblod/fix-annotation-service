@@ -1,4 +1,4 @@
-{
+const RESPONSE  = {
   "results": {
     "ordered": true,
     "distinct": false,
@@ -164,3 +164,5 @@
     "link": []
   }
 }
+
+export default RESPONSE;
