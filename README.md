@@ -1,13 +1,13 @@
 # fix-annotation-service
 
-This plugin generates annotated versions of the templates. 
+This plugin generates previews of MOW templates. 
 
 ## Endpoints
 
 ### POST /delta
 
 This endpoint delta from `delta-notifier` service. 
-It will update the `ex:annotated` property on `mobiliteit:Template` based on inserted triples.
+It will update the `ext:preview` property on `mobiliteit:Template` instances based on inserted triples.
 
 Example `delta-notifier` configuration:
 ```
@@ -32,14 +32,14 @@ Example `delta-notifier` configuration:
 
 ### POST /update-all
 
-Update all `ex:annotated` on `mobiliteit:Template`. 
+Update all `ext:preview` relationships on `mobiliteit:Template` instances. 
 ```
 docker compose exec annotater curl -X POST http://localhost/update-all
 ```
 
 ### POST /clear
 
-Delete all `ex:annotated` on `mobiliteit:Template`.
+Delete all `ext:preview` relationships on `mobiliteit:Template` instances.
 ```
 docker compose exec annotater curl -X POST http://localhost/clear
 ```
