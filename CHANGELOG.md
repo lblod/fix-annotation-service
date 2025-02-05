@@ -1,3 +1,21 @@
+
+## v4.0.0 (2025-02-05)
+
+#### :boom: Breaking Change
+* [#15](https://github.com/lblod/fix-annotation-service/pull/15) Feature/instruction annotation ([@lagartoverde](https://github.com/lagartoverde))
+
+#### :rocket: Enhancement
+* [#17](https://github.com/lblod/fix-annotation-service/pull/17) feat(template-previews): adjust service to generate previews instead of annotated html ([@elpoelma](https://github.com/elpoelma))
+* [#16](https://github.com/lblod/fix-annotation-service/pull/16) variables: replace `rdf:value` by `dct:title` ([@elpoelma](https://github.com/elpoelma))
+* [#15](https://github.com/lblod/fix-annotation-service/pull/15) Feature/instruction annotation ([@lagartoverde](https://github.com/lagartoverde))
+
+#### :bug: Bug Fix
+* [#18](https://github.com/lblod/fix-annotation-service/pull/18) Bugfix: fix dev builds ([@elpoelma](https://github.com/elpoelma))
+
+#### Committers: 2
+- Elena Poelman ([@elpoelma](https://github.com/elpoelma))
+- Oscar Rodriguez Villalobos ([@lagartoverde](https://github.com/lagartoverde))
+
 ## v3.0.0 (2025-01-30)
 
 #### :boom: Breaking Change
