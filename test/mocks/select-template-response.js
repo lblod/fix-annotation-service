@@ -4,7 +4,7 @@ const RESPONSE  = {
     "distinct": false,
     "bindings": [
       {
-        "variableValue": {
+        "variableLabel": {
           "value": "codelijst",
           "type": "literal"
         },
@@ -30,7 +30,7 @@ const RESPONSE  = {
         }
       },
       {
-        "variableValue": {
+        "variableLabel": {
           "value": "datum",
           "type": "literal"
         },
@@ -52,7 +52,7 @@ const RESPONSE  = {
         }
       },
       {
-        "variableValue": {
+        "variableLabel": {
           "value": "locatie",
           "type": "literal"
         },
@@ -74,7 +74,7 @@ const RESPONSE  = {
         }
       },
       {
-        "variableValue": {
+        "variableLabel": {
           "value": "autonummer",
           "type": "literal"
         },
@@ -96,7 +96,7 @@ const RESPONSE  = {
         }
       },
       {
-        "variableValue": {
+        "variableLabel": {
           "value": "tekst",
           "type": "literal"
         },
@@ -118,7 +118,7 @@ const RESPONSE  = {
         }
       },
       {
-        "variableValue": {
+        "variableLabel": {
           "value": "cijferstesten",
           "type": "literal"
         },
@@ -157,7 +157,7 @@ const RESPONSE  = {
       "templateValue",
       "variableUri",
       "variableType",
-      "variableValue",
+      "variableLabel",
       "variableDefaultValue",
       "variableCodelist"
     ],
