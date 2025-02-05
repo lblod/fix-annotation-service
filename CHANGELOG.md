@@ -1,4 +1,13 @@
 
+
+## v4.1.0 (2025-02-05)
+
+#### :bug: Bug Fix
+* [#19](https://github.com/lblod/fix-annotation-service/pull/19) Use correct `rdf:value` predicate for templates ([@elpoelma](https://github.com/elpoelma))
+
+#### Committers: 1
+- Elena Poelman ([@elpoelma](https://github.com/elpoelma))
+
 ## v4.0.0 (2025-02-05)
 
 #### :boom: Breaking Change
