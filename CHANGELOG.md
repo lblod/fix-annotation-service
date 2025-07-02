@@ -1,6 +1,11 @@
 
 
 
+## v4.1.2 (2025-07-02)
+
+Update build scripts to use updated Woodpecker syntax
+
+
 ## v4.1.1 (2025-07-02)
 
 #### :bug: Bug Fix
