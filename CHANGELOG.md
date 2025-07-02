@@ -1,5 +1,15 @@
 
 
+
+## v4.1.1 (2025-07-02)
+
+#### :bug: Bug Fix
+* [#20](https://github.com/lblod/fix-annotation-service/pull/20) Handle deltas with no updates without processing all templates ([@piemonkey](https://github.com/piemonkey))
+
+#### Committers: 1
+- [@piemonkey](https://github.com/piemonkey)
+
+
 ## v4.1.0 (2025-02-05)
 
 #### :bug: Bug Fix

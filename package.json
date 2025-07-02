@@ -1,6 +1,6 @@
 {
   "name": "fix-annotation-service",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "Service to generate MOW template previews via RESTful API",
   "main": "app.js",
   "type": "module",
